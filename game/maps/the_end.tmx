@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="32" tileheight="32">
- <tileset firstgid="1" source="inside.tsx"/>
- <tileset firstgid="241" source="thief.tsx"/>
+ <tileset firstgid="1" name="inside" tilewidth="32" tileheight="32">
+  <image source="gfx/inside.png" width="640" height="400"/>
+ </tileset>
+ <tileset firstgid="241" name="thief" tilewidth="32" tileheight="32">
+  <image source="gfx/thief.png" width="640" height="400"/>
+ </tileset>
  <layer name="background" width="100" height="100">
   <data encoding="csv">
 163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,163,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
