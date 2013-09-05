@@ -35,10 +35,7 @@ if (typeof String.prototype.startsWith != 'function') {
             deferred.resolve();
         };
 
-        if (tileset.image.startsWith("../")) {
-            tileset.image = tileset.image.substring(3);
-        }
-        img.src = tileset.image;
+        img.src = "maps/" + tileset.image;
         tileset.img = img;
 
         return deferred.promise();
@@ -821,7 +818,7 @@ if (typeof String.prototype.startsWith != 'function') {
             levelName = "title.json";
         }
         
-        alertImg.src = "entities/alert.png";
+        alertImg.src = "gfx/alert.png";
         alertImg.onload = function () {
             changeLevel(levelName, function () {
                 if (levelName !== "title.json") return;
