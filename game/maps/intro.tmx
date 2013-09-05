@@ -4,7 +4,7 @@
   <property name="nextmap" value="second.json"/>
  </properties>
  <tileset firstgid="1" name="inside" tilewidth="32" tileheight="32">
-  <image source="../tilesets/inside.png" width="640" height="400"/>
+  <image source="gfx/inside.png" width="640" height="400"/>
   <tile id="21">
    <properties>
     <property name="walkable" value="true"/>
@@ -86,93 +86,12 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="241" source="thief.tsx"/>
- <tileset firstgid="541" name="inside" tilewidth="32" tileheight="32">
-  <image source="../tilesets/inside.png" width="640" height="400"/>
-  <tile id="21">
-   <properties>
-    <property name="walkable" value="true"/>
-   </properties>
-  </tile>
-  <tile id="25">
-   <properties>
-    <property name="walkable" value="true"/>
-   </properties>
-  </tile>
-  <tile id="29">
-   <properties>
-    <property name="walkable" value="true"/>
-   </properties>
-  </tile>
-  <tile id="64">
-   <properties>
-    <property name="aiorder" value="stop"/>
-   </properties>
-  </tile>
-  <tile id="65">
-   <properties>
-    <property name="aiorder" value="follow"/>
-    <property name="target" value="player"/>
-   </properties>
-  </tile>
-  <tile id="66">
-   <properties>
-    <property name="aiorder" value="rand"/>
-   </properties>
-  </tile>
-  <tile id="84">
-   <properties>
-    <property name="aiorder" value="pause"/>
-   </properties>
-  </tile>
-  <tile id="85">
-   <properties>
-    <property name="aiorder" value="up"/>
-   </properties>
-  </tile>
-  <tile id="104">
-   <properties>
-    <property name="aiorder" value="left"/>
-   </properties>
-  </tile>
-  <tile id="105">
-   <properties>
-    <property name="aiorder" value="down"/>
-   </properties>
-  </tile>
-  <tile id="106">
-   <properties>
-    <property name="aiorder" value="right"/>
-   </properties>
-  </tile>
-  <tile id="120">
-   <properties>
-    <property name="isexit" value="true"/>
-    <property name="walkable" value="true"/>
-   </properties>
-  </tile>
-  <tile id="121">
-   <properties>
-    <property name="isexit" value="true"/>
-    <property name="walkable" value="true"/>
-   </properties>
-  </tile>
-  <tile id="140">
-   <properties>
-    <property name="isexit" value="true"/>
-    <property name="walkable" value="true"/>
-   </properties>
-  </tile>
-  <tile id="141">
-   <properties>
-    <property name="isexit" value="true"/>
-    <property name="walkable" value="true"/>
-   </properties>
-  </tile>
+ <tileset firstgid="241" name="thief" tilewidth="32" tileheight="32">
+  <image source="gfx/thief.png" width="640" height="480"/>
  </tileset>
  <layer name="background" width="20" height="20">
   <data encoding="csv">
-0,0,0,0,24,24,24,24,24,24,5,6,6,6,546,546,46,7,24,24,
+0,0,0,0,24,24,24,24,24,24,5,6,6,6,6,6,46,7,24,24,
 0,0,0,0,24,24,5,6,6,6,47,22,22,22,22,30,30,27,24,24,
 0,0,0,0,24,24,27,26,26,26,22,22,22,5,6,6,46,47,24,24,
 0,0,0,0,24,24,27,26,26,26,22,22,22,25,28,28,28,28,24,24,
