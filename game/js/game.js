@@ -19,13 +19,6 @@ if (typeof String.prototype.startsWith != 'function') {
     var alertImg = new Image();
 
     gameCanvas.id = "game";
-    function updateWidth() {
-        framebuffer.width = gameCanvas.width = Math.min(640, window.innerWidth);
-        framebuffer.height = gameCanvas.height = Math.min(480, window.innerHeight);
-
-        $(gameCanvas).css("left", (window.innerWidth - gameCanvas.width) / 2);
-    }
-    updateWidth();
 
     function loadTileset(tileset) {
         var img = new Image();
@@ -723,24 +716,25 @@ if (typeof String.prototype.startsWith != 'function') {
             };
         }
 
-        $(gameCanvas).on("mousedown", function (e) {
+        $(gameCanvas).off("mousedown").on("mousedown", function (e) {
             e.preventDefault();
             pointerDown = true;
             updatePointer(e);
             return false;
         });
-        $(gameCanvas).on("mouseup", function (e) {
+        $(gameCanvas).off("mouseup").on("mouseup", function (e) {
             e.preventDefault();
             pointerDown = false;
             return false;
         });
-        $(gameCanvas).on("mousemove", function (e) {
+        $(gameCanvas).off("mousemove").on("mousemove", function (e) {
             e.preventDefault();
             if (pointerDown) updatePointer(e);
             return false;
         });
 
-        $(gameCanvas).on("touchmove touchend touchstart", function (e) {
+        $(gameCanvas).off("touchmove touchend touchstart")
+            .on("touchmove touchend touchstart", function (e) {
             e.preventDefault();
 
             var touches = e.originalEvent.changedTouches;
@@ -753,13 +747,21 @@ if (typeof String.prototype.startsWith != 'function') {
             return false;
         });
 
-        $(window).on("keydown keyup", function (e) {
+        $(window).off("keydown keyup").on("keydown keyup", function (e) {
             e.preventDefault();
             var action = keys[e.keyCode];
             if (action) {
                 actions[action] = (e.type == "keydown");
             }
         });
+
+        $(window).off("resize").on("resize", function () {
+            framebuffer.width = gameCanvas.width = Math.min(640, window.innerWidth);
+            framebuffer.height = gameCanvas.height = Math.min(480, window.innerHeight);
+
+            $(gameCanvas).css("left", (window.innerWidth - gameCanvas.width) / 2);
+        });
+        $(window).trigger("resize");
 
         var lastUpdate = new Date().getTime();
         function mainloop() {
@@ -809,10 +811,6 @@ if (typeof String.prototype.startsWith != 'function') {
     }
 
     $(document).ready(function () {
-        $(document).on("touchmove", function(e) {
-            e.preventDefault();
-        }, false);
-        
         var levelName = getParameterByName("map");
         if (levelName === "") {
             levelName = "title.json";
@@ -830,6 +828,4 @@ if (typeof String.prototype.startsWith != 'function') {
         };
     });
 
-    $(window).on("resize", updateWidth);
-    updateWidth();
 }());
