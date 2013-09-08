@@ -1,0 +1,25 @@
+{
+    "player": {
+        "poses": {
+            "idle" : {
+                "frames": [0],
+                "delay": 0 
+            },
+            "walking" : {
+                "frames": [1, 2, 3, 1]
+            }
+        }
+    },
+
+    "guard": {
+        "poses": {
+            "idle" : {
+                "frames": [0],
+                "delay": 0 
+            },
+            "walking" : {
+                "frames": [1, 2, 3, 1]
+            }
+        }
+    }
+}
