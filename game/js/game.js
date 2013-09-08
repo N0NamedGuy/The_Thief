@@ -17,6 +17,7 @@ if (typeof String.prototype.startsWith != 'function') {
     var bgrender = document.createElement("canvas");
     var quit = false;
     var alertImg = new Image();
+    var entities = {};
 
     gameCanvas.id = "game";
 
@@ -47,7 +48,6 @@ if (typeof String.prototype.startsWith != 'function') {
         });
     }
 
-
     $("div#container").append(gameCanvas);
 
     function toXY(index, width) {
@@ -62,7 +62,6 @@ if (typeof String.prototype.startsWith != 'function') {
     }
 
     function prepareMap(map) {
-
         var bgCanvas = document.createElement("canvas");
         bgCanvas.width = map.width * map.tileheight;
         bgCanvas.height = map.height * map.tilewidth;
@@ -139,9 +138,15 @@ if (typeof String.prototype.startsWith != 'function') {
             var ew2 = entity.width / 2;
             var eh2 = entity.height / 2;
 
-
             if (tileset) {
-                var txy = toXY(gid - tileset.firstgid, 
+                var ent_poses = entity.poses;
+                var ent_pose = ent_poses ? ent_poses[entity.anim.pose] : undefined;
+                var ent_frames = ent_pose ? ent_pose.frames : undefined;
+                var ent_frame = ent_frames ? ent_frames[entity.anim.frame % ent_frames.length] : undefined;
+
+                var gid_offset = ent_frame ? ent_frame : 0;
+
+                var txy = toXY((gid + gid_offset) - tileset.firstgid, 
                     tileset.imagewidth / tileset.tilewidth);
 
                 ctx.drawImage(tileset.img,
@@ -300,6 +305,13 @@ if (typeof String.prototype.startsWith != 'function') {
             };
             entity.target = undefined;
             entity.wallHit = false;
+            entity.anim = {
+                frame: 0,
+                pose: "idle"
+            };
+
+            var ent_data = entities[entity.type];
+            entity.poses = ent_data ? ent_data.poses : undefined;
 
             if (entity.properties.speed) {
                 entity.start.speed = entity.speed = entity.properties.speed;
@@ -364,6 +376,9 @@ if (typeof String.prototype.startsWith != 'function') {
                 }
 
                 props = map.getTileProps(bgLayer, x, y);
+
+                this.anim.pose = "walking";
+
                 return props && props.walkable == "true";
             };
 
@@ -539,6 +554,8 @@ if (typeof String.prototype.startsWith != 'function') {
                 if (diffx + diffy > 10) {
                     this.oldx = this.x;
                     this.oldy = this.y;
+                    this.anim.frame++;
+                    console.log(this.anim.frame);
                     playAudio("step");
                 } 
             }
@@ -571,24 +588,30 @@ if (typeof String.prototype.startsWith != 'function') {
             return treasure;
         }
 
-        function loadEntities(layer) {
-            player = _.find(layer.objects, function (obj) {
-                return obj.type === "player";
-            });
+        function loadEntities(layer, callback) {
+            $.getJSON("entities.json", function (json) {
+                entities = json;
 
-            treasure = _.find(layer.objects, function (obj) {
-                return obj.type === "treasure";
-            });
+                player = _.find(layer.objects, function (obj) {
+                    return obj.type === "player";
+                });
 
-            var guards_ = _.select(layer.objects, function (obj) {
-                return obj.type === "guard";
-            });
+                treasure = _.find(layer.objects, function (obj) {
+                    return obj.type === "treasure";
+                });
 
-            player = preparePlayer(player, map);
-            treasure = prepareTreasure(treasure, map);
+                var guards_ = _.select(layer.objects, function (obj) {
+                    return obj.type === "guard";
+                });
 
-            guards = _.map(guards_, function (guard) {
-                return prepareGuard(guard, map);
+                player = preparePlayer(player, map);
+                treasure = prepareTreasure(treasure, map);
+
+                guards = _.map(guards_, function (guard) {
+                    return prepareGuard(guard, map);
+                });
+
+                if (callback) callback();
             });
         }
 
@@ -715,7 +738,6 @@ if (typeof String.prototype.startsWith != 'function') {
             outCtx.drawImage(framebuffer, 0, 0);
         }
 
-        loadEntities(entLayer);
 
         function updatePointer(ev) {
             var offset = $(gameCanvas).offset();
@@ -798,7 +820,7 @@ if (typeof String.prototype.startsWith != 'function') {
             }
         }
 
-        mainloop();
+        loadEntities(entLayer, mainloop);
     }
 
     function changeLevel(filename, callback) {
@@ -807,9 +829,7 @@ if (typeof String.prototype.startsWith != 'function') {
             loadMap(json, function (map) {
                 var newMap = prepareMap(map);
 
-                if (callback) {
-                    callback();
-                }
+                if (callback) callback();
 
                 playGame(newMap);
             });
