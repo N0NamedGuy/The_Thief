@@ -118,6 +118,7 @@ if (typeof String.prototype.startsWith != 'function') {
         map.drawTileLayer = function (layer, ctx) {
             var bgCanvas = map._bgCanvas;
             var nctx = bgCanvas.getContext("2d");
+            nctx.imageSmoothingEnabled = false;
             if (bgCanvas.dirty) {
                 map._drawTileLayer(layer, nctx);
                 map._bgCanvas.dirty = false;
@@ -193,8 +194,8 @@ if (typeof String.prototype.startsWith != 'function') {
         quit = false;
         var outCtx = gameCanvas.getContext('2d');
         var fbCtx = framebuffer.getContext('2d');
-        outCtx.mozImageSmoothingEnable = false;
-        fbCtx.mozImageSmoothingEnable = false;
+        outCtx.imageSmoothingEnable = false;
+        fbCtx.imageSmoothingEnable = false;
 
         var bgLayer = map.getLayer("background");
         var aiLayer = map.getLayer("ai");
@@ -231,7 +232,8 @@ if (typeof String.prototype.startsWith != 'function') {
 
         var camera = {
             offx: undefined,
-            offy: undefined
+            offy: undefined,
+            scale: 2
         };
 
         var countdown = {
@@ -642,8 +644,12 @@ if (typeof String.prototype.startsWith != 'function') {
                 camera.tempx = toFollow.x;
                 camera.tempy = toFollow.y;
             }
-            camera.offx = (gameCanvas.width / 2) - camera.tempx;
-            camera.offy = (gameCanvas.height / 2) - camera.tempy;
+
+            camera.offx = ((gameCanvas.width / 2) - camera.tempx);
+            camera.offy = ((gameCanvas.height / 2) - camera.tempy);
+            
+            //camera.offx = ((gameCanvas.width / 2 / camera.scale) - camera.tempx);
+            //camera.offy = ((gameCanvas.height / 2 / camera.scale) - camera.tempy);
 
             player.update(dt);
             _.each(guards, function (guard) {
@@ -687,8 +693,11 @@ if (typeof String.prototype.startsWith != 'function') {
         function renderGame() {
             fbCtx.clearRect(0, 0, framebuffer.width, framebuffer.height); 
             fbCtx.save();
-            fbCtx.translate(Math.floor(camera.offx), Math.floor(camera.offy));
-            // TODO: add zoom to correct viewports
+            //fbCtx.scale(camera.scale, camera.scale);
+            fbCtx.translate(
+                    Math.floor(camera.offx),
+                    Math.floor(camera.offy)
+            );
 
             map.drawTileLayer(bgLayer, fbCtx);
             //map._drawTileLayer(aiLayer, fbCtx);
@@ -711,8 +720,8 @@ if (typeof String.prototype.startsWith != 'function') {
         function updatePointer(ev) {
             var offset = $(gameCanvas).offset();
             pointer = {
-                x: ev.pageX - offset.left - camera.offx,
-                y: ev.pageY - offset.top - camera.offy
+                x: ((ev.pageX - offset.left) / camera.scale) - camera.offx,
+                y: ((ev.pageY - offset.top ) / camera.scale) - camera.offy
             };
         }
 
@@ -756,10 +765,17 @@ if (typeof String.prototype.startsWith != 'function') {
         });
 
         $(window).off("resize").on("resize", function () {
-            framebuffer.width = gameCanvas.width = Math.min(640, window.innerWidth);
-            framebuffer.height = gameCanvas.height = Math.min(480, window.innerHeight);
+            var w = 640, h = 480;
 
-            $(gameCanvas).css("left", (window.innerWidth - gameCanvas.width) / 2);
+            framebuffer.width = gameCanvas.width = Math.min(w / camera.scale,
+                window.innerWidth);
+            framebuffer.height = gameCanvas.height = Math.min(h / camera.scale,
+                window.innerHeight);
+
+            $(gameCanvas)
+            .css("left", (window.innerWidth - (gameCanvas.width * camera.scale)) / 2)
+            .css("width", (framebuffer.width * camera.scale) + "px")
+            .css("height", (framebuffer.height * camera.scale) + "px");
         });
         $(window).trigger("resize");
 
