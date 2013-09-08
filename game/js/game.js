@@ -803,7 +803,6 @@ if (typeof String.prototype.startsWith != 'function') {
 
     function changeLevel(filename, callback) {
         quit = true;
-        $(gameCanvas).fadeOut();
         $.getJSON("maps/" + filename, function (json) {
             loadMap(json, function (map) {
                 var newMap = prepareMap(map);
@@ -812,7 +811,6 @@ if (typeof String.prototype.startsWith != 'function') {
                     callback();
                 }
 
-                $(gameCanvas).fadeIn();
                 playGame(newMap);
             });
         });
