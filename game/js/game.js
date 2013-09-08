@@ -298,6 +298,9 @@ if (typeof String.prototype.startsWith != 'function') {
             // The origin of every entity is at its center
             entity.x += entity.width / 2;
             entity.y -= entity.height / 2;
+            entity.oldx = entity.x;
+            entity.oldy = entity.y;
+
             entity.start = {
                 x: entity.x,
                 y: entity.y,
@@ -311,7 +314,8 @@ if (typeof String.prototype.startsWith != 'function') {
             };
 
             var ent_data = entities[entity.type];
-            entity.poses = ent_data ? ent_data.poses : undefined;
+            entity.poses = ent_data ? ent_data.poses : {};
+            entity.sounds = ent_data ? ent_data.sounds : {}; 
 
             if (entity.properties.speed) {
                 entity.start.speed = entity.speed = entity.properties.speed;
@@ -356,6 +360,18 @@ if (typeof String.prototype.startsWith != 'function') {
 
                    this.target = undefined;
                 }
+
+                // Deal with steps
+                var diffx = Math.abs(this.x - this.oldx);
+                var diffy = Math.abs(this.y - this.oldy);
+                if ((diffx * diffx) + (diffy * diffy) > 10 * 10) {
+                    this.oldx = this.x;
+                    this.oldy = this.y;
+                    this.anim.frame++;
+
+                    var step_sound = entity.sounds ? entity.sounds["step"] : undefined;
+                    if (step_sound) playAudio(step_sound);
+                } 
             }
 
             entity.update = function (dt) {
@@ -538,26 +554,10 @@ if (typeof String.prototype.startsWith != 'function') {
         function preparePlayer(entity, map) {
             var player = prepareEntity(entity, map);
 
-            player.oldx = player.x;
-            player.oldy = player.y;
 
             player.reset = function () {
                 this.treasures = 0;
                 this._reset();
-            }
-
-            player.update = function(dt) {
-                this._update(dt);
-                
-                var diffx = Math.abs(this.x - this.oldx);
-                var diffy = Math.abs(this.y - this.oldy);
-                if (diffx + diffy > 10) {
-                    this.oldx = this.x;
-                    this.oldy = this.y;
-                    this.anim.frame++;
-                    console.log(this.anim.frame);
-                    playAudio("step");
-                } 
             }
 
             player.reset();

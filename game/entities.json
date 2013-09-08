@@ -1,5 +1,8 @@
 {
     "player": {
+        "sounds": {
+            "step": "step"
+        },
         "poses": {
             "idle" : {
                 "frames": [0],
