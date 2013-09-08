@@ -287,8 +287,8 @@ if (typeof String.prototype.startsWith != 'function') {
                 if (!this.startTime) return;
 
                 ctx.save();
-                ctx.font = "20pt monospace";
-                ctx.fillText(this.str, 50, 50);
+                ctx.font = "bold 12pt monospace";
+                ctx.fillText(this.str, 10, 20);
                 ctx.restore();
             }
         };
