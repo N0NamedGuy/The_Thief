@@ -1,17 +1,10 @@
 /* global Kinetic */
 /* jslint browser: true */
 
-/* From: http://stackoverflow.com/a/646643 */
-if (typeof String.prototype.startsWith != 'function') {
-  // see below for better implementation!
-  String.prototype.startsWith = function (str){
-    return this.indexOf(str) == 0;
-  };
-}
-
-
-(function Game() {
+require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
     "use strict";
+
+    console.log($_, $, _);
 
     var framebuffer = document.createElement("canvas");
     var gameCanvas = document.createElement("canvas");
@@ -191,7 +184,7 @@ if (typeof String.prototype.startsWith != 'function') {
     }
 
     function playAudio(audio) {
-        $("audio#" + audio)[0].play();
+        $_(audio).play();
     }
 
     function playGame(map) {
@@ -844,7 +837,7 @@ if (typeof String.prototype.startsWith != 'function') {
         return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     }
 
-    require(["lib/jquery", "lib/underscore"], function () {
+    require(["lib/util", "lib/jquery", "lib/underscore"], function () {
         $(document).ready(function () {
             var levelName = getParameterByName("map");
             
@@ -866,5 +859,4 @@ if (typeof String.prototype.startsWith != 'function') {
             };
         });
     });
-
-}());
+});
