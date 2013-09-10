@@ -1,10 +1,5 @@
-/* global Kinetic */
-/* jslint browser: true */
-
 require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
     "use strict";
-
-    console.log($_, $, _);
 
     var framebuffer = document.createElement("canvas");
     var gameCanvas = document.createElement("canvas");
@@ -582,7 +577,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         }
 
         function loadEntities(layer, callback) {
-            $.getJSON("entities.json", function (json) {
+            $_.getJSON("entities.json", function (json) {
                 entities = json;
 
                 player = _.find(layer.objects, function (obj) {
@@ -818,7 +813,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
 
     function changeLevel(filename, callback) {
         quit = true;
-        $.getJSON("maps/" + filename, function (json) {
+        $_.getJSON("maps/" + filename, function (json) {
             loadMap(json, function (map) {
                 var newMap = prepareMap(map);
 
