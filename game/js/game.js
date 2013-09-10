@@ -7,6 +7,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
     var quit = false;
     var alertImg = new Image();
     var entities = {};
+    var levelName;
 
     gameCanvas.id = "game";
 
@@ -103,7 +104,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 map._bgCanvas.dirty = false;
             }
             ctx.drawImage(bgCanvas, 0, 0);
-        }
+        };
 
         map.drawEntity = function(entity, cam, ctx) {
             if (entity.visible === false) {
@@ -176,11 +177,8 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
 
     function playGame(map) {
         // Preload some stuff, so we don't need to ask everytime where stuff is
-        quit = false;
         var outCtx = gameCanvas.getContext('2d');
         var fbCtx = framebuffer.getContext('2d');
-        outCtx.imageSmoothingEnable = false;
-        fbCtx.imageSmoothingEnable = false;
 
         var bgLayer = map.getLayer("background");
         var aiLayer = map.getLayer("ai");
@@ -208,8 +206,10 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             90: "up",
             81: "left"
         };
-        var pointer = undefined;
+        var pointer;
         var pointerDown = false;
+        
+        var lastUpdate;
 
         var player = {};
         var treasure = {};
@@ -272,7 +272,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 ctx.restore();
             }
         };
-
+        
         function prepareEntity(entity, map) {
             entity.map = map;
             // The origin of every entity is at its center
@@ -309,11 +309,11 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 this.target = undefined;
                 this.wallHit = false;
                 this.alerted = undefined;
-            }
+            };
 
             entity.reset = function () {
                 this._reset();
-            }
+            };
 
             entity._update = function (dt) {
                 if (this.target === undefined) {
@@ -349,14 +349,14 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                     this.oldy = this.y;
                     this.anim.frame++;
 
-                    var step_sound = entity.sounds ? entity.sounds["step"] : undefined;
+                    var step_sound = entity.sounds ? entity.sounds.step : undefined;
                     if (step_sound) playAudio(step_sound);
                 } 
-            }
+            };
 
             entity.update = function (dt) {
                 this._update(dt);
-            }
+            };
 
             entity.moveTo = function (x, y) {
                 var map = this.map;
@@ -387,7 +387,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                     speed = properties.speed;
                 }
                 this.setTarget(this.x + (x * speed), this.y + (y * speed));
-            }
+            };
 
             entity.setTarget = function (x, y) {
                 this.target = {x: x, y: y};
@@ -415,13 +415,13 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 });
 
                 return !ret; 
-            }
+            };
 
             entity.hasHitWall = function () {
                 var ret = this.wallHit;
                 this.wallHit = false;
                 return ret;
-            }
+            };
 
             return entity;
         }
@@ -432,19 +432,19 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             guard.isFollowing = false;
 
             if (guard.properties.aiorder) {
-                guard.aiorder = guard.properties.aiorder
+                guard.aiorder = guard.properties.aiorder;
             } else {
                 guard.aiorder = "stop";
             }
 
             if (guard.properties.aifollowdist) {
-                guard.aifollowdist= parseInt(guard.properties.aifollowdist);
+                guard.aifollowdist= parseInt(guard.properties.aifollowdist, 10);
             } else {
                 guard.aifollowdist= 3;
             }
             
             if (guard.properties.aifollowspeed) {
-                guard.aifollowspeed = parseInt(guard.properties.aifollowspeed);
+                guard.aifollowspeed = parseInt(guard.properties.aifollowspeed, 10);
             } else {
                 guard.aifollowspeed = Math.floor(3 * (player.start.speed / 4));
             }
@@ -491,7 +491,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                     ent.setTarget(player.x, player.y);
                 }, stop: function (ent, dt) {
                 }
-            }
+            };
 
             guard.update = function (dt) {
                 var props = this.map.getTileProps(aiLayer, this.x, this.y);
@@ -526,7 +526,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 }
 
                 this._update(dt);
-            }
+            };
 
             return guard;
         }
@@ -690,7 +690,6 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                     changeLevel(map.properties.nextmap);
                 }
             };
-
         }
         
         function renderGame() {
@@ -720,7 +719,6 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
 
         function updatePointer(ev) {
             // TODO: get canvas offset without resorting to jQuery
-            console.log("game canvas", gameCanvas);
             var offset = $(gameCanvas).offset();
             pointer = {
                 x: ((ev.pageX - offset.left) / camera.scale) - camera.offx,
@@ -728,63 +726,63 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             };
         }
 
-        // TODO: use native event listeners
-        $(gameCanvas).off("mousedown").on("mousedown", function (e) {
-            console.log("mousedown event", e);
-            e.preventDefault();
-            pointerDown = true;
-            updatePointer(e);
-            return false;
-        });
-        $(gameCanvas).off("mouseup").on("mouseup", function (e) {
-            e.preventDefault();
-            pointerDown = false;
-            return false;
-        });
-        $(gameCanvas).off("mousemove").on("mousemove", function (e) {
-            e.preventDefault();
-            if (pointerDown) updatePointer(e);
-            return false;
-        });
-
-        $(gameCanvas).off("touchmove touchend touchstart")
-            .on("touchmove touchend touchstart", function (e) {
-            e.preventDefault();
-
-            var touches = e.originalEvent.changedTouches;
-            if (touches.length != 1) {
+        function bindEvents() {
+            // TODO: use native event listeners
+            $(gameCanvas).off("mousedown").on("mousedown", function (e) {
+                e.preventDefault();
+                pointerDown = true;
+                updatePointer(e);
                 return false;
-            }
-            var touch = touches[0];
-            updatePointer(touch);
+            });
+            $(gameCanvas).off("mouseup").on("mouseup", function (e) {
+                e.preventDefault();
+                pointerDown = false;
+                return false;
+            });
+            $(gameCanvas).off("mousemove").on("mousemove", function (e) {
+                e.preventDefault();
+                if (pointerDown) updatePointer(e);
+                return false;
+            });
 
-            return false;
-        });
+            $(gameCanvas).off("touchmove touchend touchstart")
+                .on("touchmove touchend touchstart", function (e) {
+                e.preventDefault();
 
-        $(window).off("keydown keyup").on("keydown keyup", function (e) {
-            e.preventDefault();
-            var action = keys[e.keyCode];
-            if (action) {
-                actions[action] = (e.type == "keydown");
-            }
-        });
+                var touches = e.originalEvent.changedTouches;
+                if (touches.length != 1) {
+                    return false;
+                }
+                var touch = touches[0];
+                updatePointer(touch);
 
-        $(window).off("resize").on("resize", function () {
-            var w = 640, h = 480;
+                return false;
+            });
 
-            framebuffer.width = gameCanvas.width = Math.min(w / camera.scale,
-                window.innerWidth);
-            framebuffer.height = gameCanvas.height = Math.min(h / camera.scale,
-                window.innerHeight);
+            $(window).off("keydown keyup").on("keydown keyup", function (e) {
+                e.preventDefault();
+                var action = keys[e.keyCode];
+                if (action) {
+                    actions[action] = (e.type == "keydown");
+                }
+            });
 
-            $(gameCanvas)
-            .css("left", (window.innerWidth - (gameCanvas.width * camera.scale)) / 2)
-            .css("width", (framebuffer.width * camera.scale) + "px")
-            .css("height", (framebuffer.height * camera.scale) + "px");
-        });
-        $(window).trigger("resize");
+            $(window).off("resize").on("resize", function () {
+                var w = 640, h = 480;
 
-        var lastUpdate = $_.getTicks();
+                framebuffer.width = gameCanvas.width = Math.min(w / camera.scale,
+                    window.innerWidth);
+                framebuffer.height = gameCanvas.height = Math.min(h / camera.scale,
+                    window.innerHeight);
+
+                $(gameCanvas)
+                .css("left", (window.innerWidth - (gameCanvas.width * camera.scale)) / 2)
+                .css("width", (framebuffer.width * camera.scale) + "px")
+                .css("height", (framebuffer.height * camera.scale) + "px");
+            });
+            $(window).trigger("resize");
+        }
+
         function mainloop() {
             var curTime = $_.getTicks();
             var dt = (curTime - lastUpdate) / 60;
@@ -802,6 +800,12 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 }
             }
         }
+    
+        quit = false;
+        lastUpdate = $_.getTicks();
+        outCtx.imageSmoothingEnable = false;
+        fbCtx.imageSmoothingEnable = false;
+        bindEvents();
 
         loadEntities(entLayer, mainloop);
     }
@@ -811,6 +815,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         $_.getJSON("maps/" + filename, function (json) {
             loadMap(json, function (map) {
                 var newMap = prepareMap(map);
+                levelName = filename;
 
                 if (callback) callback();
 
@@ -819,7 +824,9 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         });
     }
 
-    var levelName = $_.getParameterByName("map");
+        
+    levelName = $_.getParameterByName("map");
+
     levelName = (levelName === "") ? "intro.json" : levelName;
     $_("container").appendChild(gameCanvas);
     
