@@ -9,6 +9,7 @@ if (typeof String.prototype.startsWith != 'function') {
   };
 }
 
+
 (function Game() {
     "use strict";
 
@@ -48,7 +49,6 @@ if (typeof String.prototype.startsWith != 'function') {
         });
     }
 
-    $("div#container").append(gameCanvas);
 
     function toXY(index, width) {
         return {
@@ -844,22 +844,27 @@ if (typeof String.prototype.startsWith != 'function') {
         return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     }
 
-    $(document).ready(function () {
-        var levelName = getParameterByName("map");
-        if (levelName === "") {
-            levelName = "title.json";
-        }
-        
-        alertImg.src = "gfx/alert.png";
-        alertImg.onload = function () {
-            changeLevel(levelName, function () {
-                if (levelName !== "title.json") return;
+    require(["lib/jquery", "lib/underscore"], function () {
+        $(document).ready(function () {
+            var levelName = getParameterByName("map");
+            
+            $("div#container").append(gameCanvas);
+            
+            if (levelName === "") {
+                levelName = "title.json";
+            }
+            
+            alertImg.src = "gfx/alert.png";
+            alertImg.onload = function () {
+                changeLevel(levelName, function () {
+                    if (levelName !== "title.json") return;
 
-                window.setTimeout(function () {
-                    changeLevel("intro.json");
-                }, 5000);
-            });
-        };
+                    window.setTimeout(function () {
+                        changeLevel("intro.json");
+                    }, 5000);
+                });
+            };
+        });
     });
 
 }());
