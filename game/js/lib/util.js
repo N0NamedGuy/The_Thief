@@ -1,19 +1,20 @@
-define(function util() {
+define(["lib/underscore"], function util() {
     "use strict";
+
+    var startTime = new Date().getTime();
+
     var $_ = function (id) {
         if (id) {
             return document.getElementById(id);
         } else {
             return undefined;
         }
-
     };
 
     $_.getAJAX = function(req, callback) {
         var xhr = new XMLHttpRequest();
         //xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
-            console.log(xhr);
             if (this.readyState === 4) {
                 if (this.status === 200) {
                     var ret = xhr.responseText;
@@ -42,6 +43,49 @@ define(function util() {
             }
         });
     };
+
+    /** Loads an arbitrary amount of resources asynchronously. 
+     * @param {Array} paths - Path array to the resources
+     * @param {function} loader - A loader function to load a path
+     * @param {function} callback - When everything is loaded, this callback is called */
+
+    $_.loadResources = function (paths, loader, callback) {
+        var remaining = paths.length;
+
+        var loadedFun = function () {
+            remaining--;
+            if (remaining === 0 && typeof callback === "function") {
+                callback(res);
+            }
+        };
+
+        var res = _.map(paths, function(path) {
+            return loader(path, loadedFun);
+        });
+    };
+
+    $_.loadImages = function (srcArr, callback) {
+        return this.loadResources(srcArr, function (src, loadedfun) {
+            var img = new Image();
+            img.src = src;
+            img.onload = loadedfun;
+            return img;
+
+        }, callback);
+    };
+
+    // From: http://stackoverflow.com/a/901144
+    $_.getParameterByName = function (name) {
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    };
+
+    $_.getTicks = function () {
+        var now = new Date().getTime();
+        return now - startTime;
+    }
 
     /* From: http://stackoverflow.com/a/646643 */
     if (typeof String.prototype.startsWith != 'function') {

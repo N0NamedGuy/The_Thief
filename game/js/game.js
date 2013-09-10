@@ -10,33 +10,25 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
 
     gameCanvas.id = "game";
 
-    function loadTileset(tileset) {
+    function loadTileset(tileset, loadedFun) {
         var img = new Image();
-        var deferred = $.Deferred();
 
-        img.onload = function () {
-            deferred.resolve();
-        };
+        img.onload = loadedFun;
 
         img.src = "maps/" + tileset.image;
         tileset.img = img;
 
-        return deferred.promise();
+        return tileset;
     }
 
     function loadMap(json, callback) {
         var map = json;
-        var tilesetLoaders = [];
 
-        _.each(map.tilesets, function (tileset) {
-            tilesetLoaders.push(loadTileset(tileset));
-        });
-        
-        $.when.apply(null, tilesetLoaders).done(function () {
+        /* Load tilesets */
+        $_.loadResources(map.tilesets, loadTileset, function () {
             callback(map);
         });
     }
-
 
     function toXY(index, width) {
         return {
@@ -241,14 +233,14 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             },
             
             start: function () {
-                this.startTime = this.curTime = new Date().getTime();
+                this.startTime = this.curTime = $_.getTicks();
                 this.failed = false;
             },
 
             update: function () {
                 if (!this.startTime) return;
 
-                var curTime = new Date().getTime();
+                var curTime = $_.getTicks();
                 var diff = (10000) - (curTime - this.startTime);
 
                 var secs = Math.floor(diff / 1000);
@@ -479,7 +471,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                         }
                     }
                 }, pause: function (ent, dt) {
-                    var curTime = new Date().getTime();
+                    var curTime = $_.getTicks();
                     if (ent.pauseTime === undefined) {
                         ent.pauseTime = curTime;
                     }
@@ -726,8 +718,9 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             outCtx.drawImage(framebuffer, 0, 0);
         }
 
-
         function updatePointer(ev) {
+            // TODO: get canvas offset without resorting to jQuery
+            console.log("game canvas", gameCanvas);
             var offset = $(gameCanvas).offset();
             pointer = {
                 x: ((ev.pageX - offset.left) / camera.scale) - camera.offx,
@@ -735,7 +728,9 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             };
         }
 
+        // TODO: use native event listeners
         $(gameCanvas).off("mousedown").on("mousedown", function (e) {
+            console.log("mousedown event", e);
             e.preventDefault();
             pointerDown = true;
             updatePointer(e);
@@ -789,9 +784,9 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         });
         $(window).trigger("resize");
 
-        var lastUpdate = new Date().getTime();
+        var lastUpdate = $_.getTicks();
         function mainloop() {
-            var curTime = new Date().getTime();
+            var curTime = $_.getTicks();
             var dt = (curTime - lastUpdate) / 60;
 
             processInput(dt);
@@ -823,35 +818,13 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             });
         });
     }
+
+    var levelName = $_.getParameterByName("map");
+    levelName = (levelName === "") ? "intro.json" : levelName;
+    $_("container").appendChild(gameCanvas);
     
-    // From: http://stackoverflow.com/a/901144
-    function getParameterByName(name) {
-        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-            results = regex.exec(location.search);
-        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    }
-
-    require(["lib/util", "lib/jquery", "lib/underscore"], function () {
-        $(document).ready(function () {
-            var levelName = getParameterByName("map");
-            
-            $("div#container").append(gameCanvas);
-            
-            if (levelName === "") {
-                levelName = "title.json";
-            }
-            
-            alertImg.src = "gfx/alert.png";
-            alertImg.onload = function () {
-                changeLevel(levelName, function () {
-                    if (levelName !== "title.json") return;
-
-                    window.setTimeout(function () {
-                        changeLevel("intro.json");
-                    }, 5000);
-                });
-            };
-        });
-    });
+    alertImg.src = "gfx/alert.png";
+    alertImg.onload = function () {
+        changeLevel(levelName);
+    };
 });
