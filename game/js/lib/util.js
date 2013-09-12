@@ -64,14 +64,25 @@ define(["lib/underscore"], function util() {
         });
     };
 
-    $_.loadImages = function (srcArr, callback) {
-        return this.loadResources(srcArr, function (src, loadedfun) {
-            var img = new Image();
-            img.src = src;
-            img.onload = loadedfun;
-            return img;
+    $_.loadImages = function (pathsObj, callback) {
+        console.log(_);
+        var pairs = _.pairs(pathsObj);
 
-        }, callback);
+        return this.loadResources(pairs, function (pair, loadedfun) {
+            var img = new Image();
+            var ret = [pair[0], img];
+            img.onload = loadedfun;
+            img.src = pair[1];
+
+            return ret;
+        }, function (loaded) {
+            var ret = _.reduceRight(loaded, function (obj, pair) {
+                obj[pair[0]] = pair[1]; 
+                return obj;
+            }, {});
+            
+            if (typeof callback === "function") callback(ret);
+        });
     };
 
     // From: http://stackoverflow.com/a/901144
