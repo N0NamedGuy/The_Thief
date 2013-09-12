@@ -9,7 +9,31 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
     var entities = {};
     var levelName;
 
-    gameCanvas.id = "game";
+    var actions = {
+        "up": false,
+        "down": false,
+        "left": false,
+        "right": false
+    };
+    var keys = {
+        // WASD
+        87: "up",
+        65: "left",
+        83: "down",
+        68: "right",
+
+        // Arrows
+        38: "up",
+        37: "left",
+        40: "down",
+        39: "right",
+
+        // ZQSD
+        90: "up",
+        81: "left"
+    };
+    var pointer;
+    var pointerDown = false;
 
     function loadTileset(tileset, loadedFun) {
         var img = new Image();
@@ -183,31 +207,6 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         var bgLayer = map.getLayer("background");
         var aiLayer = map.getLayer("ai");
         var entLayer = map.getLayer("entities");
-        var actions = {
-            "up": false,
-            "down": false,
-            "left": false,
-            "right": false
-        };
-        var keys = {
-            // WASD
-            87: "up",
-            65: "left",
-            83: "down",
-            68: "right",
-
-            // Arrows
-            38: "up",
-            37: "left",
-            40: "down",
-            39: "right",
-
-            // ZQSD
-            90: "up",
-            81: "left"
-        };
-        var pointer;
-        var pointerDown = false;
         
         var lastUpdate;
 
@@ -731,12 +730,12 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         }
 
         function bindEvents() {
-            if (gameCanvas.eventsBound) return;
+            console.log(gameCanvas.eventsBound);
+            if (gameCanvas.eventsBound === true) return;
 
             function onMouse(e) {
                 e.preventDefault();
                 if (e.type === "mousedown") {
-                    console.log("bla");
                     pointerDown = true;
                 } else if (e.type === "mouseup") {
                     pointerDown = false;
@@ -745,7 +744,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
 
                 if (pointerDown) updatePointer(e);
                 return false;
-            };
+            }
 
             function onTouch(e) {
                 e.preventDefault();
@@ -758,7 +757,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 updatePointer(touch);
 
                 return false;
-            };
+            }
 
             function onKey(e) {
                 e.preventDefault();
@@ -768,8 +767,8 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                     actions[action] = (e.type == "keydown");
                 }
 
-            };
-
+            }
+            
             function onResize(e) {
                 var w = 640, h = 480;
 
@@ -782,7 +781,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 .css("left", (window.innerWidth - (gameCanvas.width * camera.scale)) / 2)
                 .css("width", (gameCanvas.width * camera.scale) + "px")
                 .css("height", (gameCanvas.height * camera.scale) + "px");
-            };
+            }
 
             gameCanvas.addEventListener("mousedown", onMouse, true);
             gameCanvas.addEventListener("mouseup", onMouse, true);
