@@ -49,7 +49,7 @@ define(["lib/underscore"], function util() {
      * @param {function} loader - A loader function to load a path
      * @param {function} callback - When everything is loaded, this callback is called */
 
-    $_.loadResources = function (paths, loader, callback) {
+    $_.loadAsynch = function (paths, loader, callback) {
         var remaining = paths.length;
 
         var loadedFun = function () {
@@ -64,24 +64,19 @@ define(["lib/underscore"], function util() {
         });
     };
 
-    $_.loadImages = function (pathsObj, callback) {
-        var pairs = _.pairs(pathsObj);
-
-        return this.loadResources(pairs, function (pair, loadedfun) {
-            var img = new Image();
-            var ret = [pair[0], img];
-            img.onload = loadedfun;
-            img.src = pair[1];
-
-            return ret;
-        }, function (loaded) {
-            var ret = _.reduceRight(loaded, function (obj, pair) {
-                obj[pair[0]] = pair[1]; 
-                return obj;
-            }, {});
-            
-            if (typeof callback === "function") callback(ret);
-        });
+    /**
+     * Runs multiple functions "in parallel".
+     *
+     * @param {function[]} funs - An arrays of functions with one argument
+     * (which we'll call loadedFun) that should be called when the function's
+     * task is done.
+     *
+     * @return an array containing all functions return values (if any)
+     */
+    $_.runParallel = function (funs, cb) {
+        return $_.loadAsynch(funs, function (fun, loadedFun) {
+            return fun(loadedFun);
+        }, cb);
     };
 
     // From: http://stackoverflow.com/a/901144
@@ -96,6 +91,13 @@ define(["lib/underscore"], function util() {
         var now = new Date().getTime();
         return now - startTime;
     };
+
+    $_.makeMap = function (arr) {
+        return _.reduceRight(arr, function (obj, pair) {
+            obj[pair[0]] = pair[1]; 
+            return obj;
+        }, {});
+    }
 
     /* From: http://stackoverflow.com/a/646643 */
     if (typeof String.prototype.startsWith != 'function') {

@@ -61,7 +61,7 @@ function (Util, Assets, __) {
         var map = json;
 
         /* Load tilesets */
-        Util.loadResources(map.tilesets, loadTileset, function () {
+        Util.loadAsynch(map.tilesets, loadTileset, function () {
             callback(map);
         });
     }
@@ -176,7 +176,7 @@ function (Util, Assets, __) {
                     tileset.tileheight);
 
                 if (entity.alerted) {
-                    ctx.drawImage(Assets.images.alert,
+                    ctx.drawImage(Assets.images.alerted,
                         Math.floor(entity.x - ew2),
                         Math.floor(entity.y - eh2) - map.tileheight);
                 }
@@ -206,8 +206,9 @@ function (Util, Assets, __) {
         return map;
     }
 
+    // TODO: deprecate this function
     function playAudio(audio) {
-        Util(audio).play();
+        Assets.audio[audio].play();
     }
 
     function updatePointer(ev) {
@@ -605,7 +606,7 @@ function (Util, Assets, __) {
                 if (this.aifollowdist> 0 && dist <= this.aifollowdist) {
                     order = "follow";
                     if (!this.alerted) {
-                        playAudio("alert");
+                        playAudio("alerted");
                         this.alerted = true;
                     }
                     this.speed = this.aifollowspeed;
