@@ -327,8 +327,6 @@ require(["lib/util", "lib/underscore"], function ($_) {
         var treasure = {};
         var guards = [];
 
-
-
         var countdown = {
             startTime: undefined,
             failed: false,
@@ -499,7 +497,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
 
             entity.setTarget = function (x, y) {
                 this.target = {x: x, y: y};
-            }
+            };
 
             entity.collide = function (other) {
                 var mw2 = this.width / 2;
@@ -646,7 +644,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
             player.reset = function () {
                 this.treasures = 0;
                 this._reset();
-            }
+            };
 
             player.reset();
             return player;
@@ -662,7 +660,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
                 this.visible = true;
                 this.gid = treasure.properties.closedgid;
                 this._reset();
-            }
+            };
 
             treasure.open = function (player) {
                 if (this.isOpen) return;
@@ -672,7 +670,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
                 this.isOpen = true;
                 playAudio("treasure");
                 countdown.start();
-            }
+            };
             return treasure;
         }
 
@@ -726,7 +724,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
                 dy = 1;
             }
 
-            if (dx != 0 || dy != 0) {
+            if (dx !== 0 || dy !== 0) {
                 player.moveRelative(dx * dt, dy * dt);
             }
 
@@ -797,7 +795,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
                 if (player.treasures > 0) {
                     loadLevel(map.properties.nextmap);
                 }
-            };
+            }
         }
         
         function renderGame() {
