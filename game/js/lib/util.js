@@ -96,7 +96,7 @@ define(["lib/underscore"], function util() {
     $_.getTicks = function () {
         var now = new Date().getTime();
         return now - startTime;
-    }
+    };
 
     /* From: http://stackoverflow.com/a/646643 */
     if (typeof String.prototype.startsWith != 'function') {
