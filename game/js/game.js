@@ -718,11 +718,15 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         }
 
         function updatePointer(ev) {
-            // TODO: get canvas offset without resorting to jQuery
-            var offset = $(gameCanvas).offset();
+            var off = gameCanvas.getBoundingClientRect();
+            var offset = {
+                left: ev.pageX - off.left,
+                top: ev.pageY - off.top
+            };
+
             pointer = {
-                x: ((ev.pageX - offset.left) / camera.scale) - camera.offx,
-                y: ((ev.pageY - offset.top ) / camera.scale) - camera.offy
+                x: (offset.left / camera.scale) - camera.offx,
+                y: (offset.top / camera.scale) - camera.offy
             };
         }
 
