@@ -1,4 +1,4 @@
-require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
+require(["lib/util", "lib/underscore"], function ($_) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -8,6 +8,9 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
     var alertImg = new Image();
     var entities = {};
     var levelName;
+    var imageAssets = {
+        alert: "gfx/alert.png"   
+    };
 
     var actions = {
         "up": false,
@@ -34,6 +37,20 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
     };
     var pointer;
     var pointerDown = false;
+    var updatePointerFun;
+
+    var camera = {
+        offx: undefined,
+        offy: undefined,
+        scale: 2
+    };
+
+    function loadAssets(callback) {
+        $_.loadImages(imageAssets, function (loaded) {
+            imageAssets = loaded;
+           if (typeof callback === "function") callback(); 
+        });
+    }
 
     function loadTileset(tileset, loadedFun) {
         var img = new Image();
@@ -165,7 +182,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                     tileset.tileheight);
 
                 if (entity.alerted) {
-                    ctx.drawImage(alertImg,
+                    ctx.drawImage(imageAssets.alert,
                         Math.floor(entity.x - ew2),
                         Math.floor(entity.y - eh2) - map.tileheight);
                 }
@@ -199,6 +216,101 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         $_(audio).play();
     }
 
+    function updatePointer(ev) {
+        var off = gameCanvas.getBoundingClientRect();
+        var offset = {
+            left: ev.pageX - off.left,
+            top: ev.pageY - off.top
+        };
+
+        pointer = {
+            x: (offset.left / camera.scale) - camera.offx,
+            y: (offset.top / camera.scale) - camera.offy
+        };
+    }
+
+    function bindEvents() {
+        function onMouse(e) {
+            e.preventDefault();
+            if (e.type === "mousedown") {
+                pointerDown = true;
+            } else if (e.type === "mouseup") {
+                pointerDown = false;
+                return;
+            }
+
+            updatePointer(e);
+            return false;
+        }
+
+        function onTouch(e) {
+            e.preventDefault();
+
+            var touches = e.changedTouches;
+            if (touches.length != 1) {
+                return false;
+            }
+            var touch = touches[0];
+            updatePointer(touch);
+
+            return false;
+        }
+
+        function onKey(e) {
+            e.preventDefault();
+
+            var action = keys[e.keyCode];
+            if (action) {
+                actions[action] = (e.type == "keydown");
+            }
+
+        }
+        
+        function onResize(e) {
+            var w = 640, h = 480;
+            var style = gameCanvas.style;
+
+            framebuffer.width = gameCanvas.width = Math.min(w / camera.scale,
+                window.innerWidth / camera.scale);
+            framebuffer.height = gameCanvas.height = Math.min(h / camera.scale,
+                window.innerHeight / camera.scale);
+
+            style.left = ((window.innerWidth - 
+                    (gameCanvas.width * camera.scale)) / 2) + "px";
+
+            style.width = (gameCanvas.width * camera.scale) + "px";
+            style.height = (gameCanvas.height * camera.scale) + "px";
+        }
+
+        gameCanvas.addEventListener("mousedown", onMouse, true);
+        gameCanvas.addEventListener("mouseup", onMouse, true);
+        gameCanvas.addEventListener("mousemove", onMouse, true);
+
+        gameCanvas.addEventListener("touchmove", onTouch, true);
+        gameCanvas.addEventListener("touchend", onTouch, true);
+        gameCanvas.addEventListener("touchstart", onTouch, true);
+
+        window.addEventListener("keydown", onKey, true);
+        window.addEventListener("keyup", onKey, true);
+
+        window.addEventListener("resize", onResize, true);
+        onResize();
+    }
+
+    function loadLevel(filename, callback) {
+        quit = true;
+        $_.getJSON("maps/" + filename, function (json) {
+            loadMap(json, function (map) {
+                var newMap = prepareMap(map);
+                levelName = filename;
+
+                if (callback) callback();
+
+                playGame(newMap);
+            });
+        });
+    }
+
     function playGame(map) {
         // Preload some stuff, so we don't need to ask everytime where stuff is
         var outCtx = gameCanvas.getContext('2d');
@@ -214,11 +326,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         var treasure = {};
         var guards = [];
 
-        var camera = {
-            offx: undefined,
-            offy: undefined,
-            scale: 2
-        };
+
 
         var countdown = {
             startTime: undefined,
@@ -686,7 +794,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             var props = map.getTileProps(bgLayer, player.x, player.y);
             if (props && props.isexit && props.isexit === "true") {
                 if (player.treasures > 0) {
-                    changeLevel(map.properties.nextmap);
+                    loadLevel(map.properties.nextmap);
                 }
             };
         }
@@ -716,90 +824,6 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             outCtx.drawImage(framebuffer, 0, 0);
         }
 
-        function updatePointer(ev) {
-            var off = gameCanvas.getBoundingClientRect();
-            var offset = {
-                left: ev.pageX - off.left,
-                top: ev.pageY - off.top
-            };
-
-            pointer = {
-                x: (offset.left / camera.scale) - camera.offx,
-                y: (offset.top / camera.scale) - camera.offy
-            };
-        }
-
-        function bindEvents() {
-            console.log(gameCanvas.eventsBound);
-            if (gameCanvas.eventsBound === true) return;
-
-            function onMouse(e) {
-                e.preventDefault();
-                if (e.type === "mousedown") {
-                    pointerDown = true;
-                } else if (e.type === "mouseup") {
-                    pointerDown = false;
-                    return;
-                }
-
-                if (pointerDown) updatePointer(e);
-                return false;
-            }
-
-            function onTouch(e) {
-                e.preventDefault();
-
-                var touches = e.changedTouches;
-                if (touches.length != 1) {
-                    return false;
-                }
-                var touch = touches[0];
-                updatePointer(touch);
-
-                return false;
-            }
-
-            function onKey(e) {
-                e.preventDefault();
-
-                var action = keys[e.keyCode];
-                if (action) {
-                    actions[action] = (e.type == "keydown");
-                }
-
-            }
-            
-            function onResize(e) {
-                var w = 640, h = 480;
-
-                framebuffer.width = gameCanvas.width = Math.min(w / camera.scale,
-                    window.innerWidth / camera.scale);
-                framebuffer.height = gameCanvas.height = Math.min(h / camera.scale,
-                    window.innerHeight / camera.scale);
-
-                $(gameCanvas)
-                .css("left", (window.innerWidth - (gameCanvas.width * camera.scale)) / 2)
-                .css("width", (gameCanvas.width * camera.scale) + "px")
-                .css("height", (gameCanvas.height * camera.scale) + "px");
-            }
-
-            gameCanvas.addEventListener("mousedown", onMouse, true);
-            gameCanvas.addEventListener("mouseup", onMouse, true);
-            gameCanvas.addEventListener("mousemove", onMouse, true);
-
-            gameCanvas.addEventListener("touchmove", onTouch, true);
-            gameCanvas.addEventListener("touchend", onTouch, true);
-            gameCanvas.addEventListener("touchstart", onTouch, true);
-
-            window.addEventListener("keydown", onKey, true);
-            window.addEventListener("keyup", onKey, true);
-
-            window.addEventListener("resize", onResize, true);
-            onResize();
-
-            gameCanvas.eventsBound = true;
-        }
-
         function mainloop() {
             var curTime = $_.getTicks();
             var dt = (curTime - lastUpdate) / 60;
@@ -818,38 +842,25 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
             }
         }
 
-    
-        quit = false;
-        lastUpdate = $_.getTicks();
-        outCtx.imageSmoothingEnable = false;
-        fbCtx.imageSmoothingEnable = false;
+        function init() {
+            quit = false;
+            lastUpdate = $_.getTicks();
+            outCtx.imageSmoothingEnable = false;
+            fbCtx.imageSmoothingEnable = false;
 
-        bindEvents();
-        loadEntities(entLayer, mainloop);
+            loadEntities(entLayer, mainloop);
+        }
+        init();
     }
 
-    function changeLevel(filename, callback) {
-        quit = true;
-        $_.getJSON("maps/" + filename, function (json) {
-            loadMap(json, function (map) {
-                var newMap = prepareMap(map);
-                levelName = filename;
-
-                if (callback) callback();
-
-                playGame(newMap);
-            });
-        });
-    }
-
-        
+    bindEvents();
     levelName = $_.getParameterByName("map");
 
     levelName = (levelName === "") ? "intro.json" : levelName;
     $_("container").appendChild(gameCanvas);
     
-    alertImg.src = "gfx/alert.png";
-    alertImg.onload = function () {
-        changeLevel(levelName);
-    };
+    loadAssets(function () {
+        loadLevel(levelName);
+    });
+
 });
