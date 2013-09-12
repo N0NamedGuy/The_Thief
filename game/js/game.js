@@ -1,4 +1,8 @@
-require(["lib/util", "lib/underscore"], function ($_) {
+require(["lib/util",
+        "assets",
+        "lib/underscore"],
+
+function (Util, Assets, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -8,9 +12,6 @@ require(["lib/util", "lib/underscore"], function ($_) {
     var alertImg = new Image();
     var entities = {};
     var levelName;
-    var imageAssets = {
-        alert: "gfx/alert.png"   
-    };
 
     var actions = {
         "up": false,
@@ -45,13 +46,6 @@ require(["lib/util", "lib/underscore"], function ($_) {
         scale: 2
     };
 
-    function loadAssets(callback) {
-        $_.loadImages(imageAssets, function (loaded) {
-            imageAssets = loaded;
-           if (typeof callback === "function") callback(); 
-        });
-    }
-
     function loadTileset(tileset, loadedFun) {
         var img = new Image();
 
@@ -67,7 +61,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
         var map = json;
 
         /* Load tilesets */
-        $_.loadResources(map.tilesets, loadTileset, function () {
+        Util.loadResources(map.tilesets, loadTileset, function () {
             callback(map);
         });
     }
@@ -182,7 +176,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
                     tileset.tileheight);
 
                 if (entity.alerted) {
-                    ctx.drawImage(imageAssets.alert,
+                    ctx.drawImage(Assets.images.alert,
                         Math.floor(entity.x - ew2),
                         Math.floor(entity.y - eh2) - map.tileheight);
                 }
@@ -213,7 +207,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
     }
 
     function playAudio(audio) {
-        $_(audio).play();
+        Util(audio).play();
     }
 
     function updatePointer(ev) {
@@ -300,7 +294,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
 
     function loadLevel(filename, callback) {
         quit = true;
-        $_.getJSON("maps/" + filename, function (json) {
+        Util.getJSON("maps/" + filename, function (json) {
             loadMap(json, function (map) {
                 var newMap = prepareMap(map);
                 levelName = filename;
@@ -339,14 +333,14 @@ require(["lib/util", "lib/underscore"], function ($_) {
             },
             
             start: function () {
-                this.startTime = this.curTime = $_.getTicks();
+                this.startTime = this.curTime = Util.getTicks();
                 this.failed = false;
             },
 
             update: function () {
                 if (!this.startTime) return;
 
-                var curTime = $_.getTicks();
+                var curTime = Util.getTicks();
                 var diff = (10000) - (curTime - this.startTime);
 
                 var secs = Math.floor(diff / 1000);
@@ -577,7 +571,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
                         }
                     }
                 }, pause: function (ent, dt) {
-                    var curTime = $_.getTicks();
+                    var curTime = Util.getTicks();
                     if (ent.pauseTime === undefined) {
                         ent.pauseTime = curTime;
                     }
@@ -675,7 +669,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
         }
 
         function loadEntities(layer, callback) {
-            $_.getJSON("entities.json", function (json) {
+            Util.getJSON("entities.json", function (json) {
                 entities = json;
 
                 player = _.find(layer.objects, function (obj) {
@@ -824,7 +818,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
         }
 
         function mainloop() {
-            var curTime = $_.getTicks();
+            var curTime = Util.getTicks();
             var dt = (curTime - lastUpdate) / 60;
 
             processInput(dt);
@@ -843,7 +837,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
 
         function init() {
             quit = false;
-            lastUpdate = $_.getTicks();
+            lastUpdate = Util.getTicks();
             outCtx.imageSmoothingEnable = false;
             fbCtx.imageSmoothingEnable = false;
 
@@ -853,13 +847,12 @@ require(["lib/util", "lib/underscore"], function ($_) {
     }
 
     bindEvents();
-    levelName = $_.getParameterByName("map");
+    levelName = Util.getParameterByName("map");
 
     levelName = (levelName === "") ? "intro.json" : levelName;
-    $_("container").appendChild(gameCanvas);
+    Util("container").appendChild(gameCanvas);
     
-    loadAssets(function () {
+    Assets.load(function () {
         loadLevel(levelName);
     });
-
 });
