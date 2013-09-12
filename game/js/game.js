@@ -4,7 +4,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
     var framebuffer = document.createElement("canvas");
     var gameCanvas = document.createElement("canvas");
     var bgrender = document.createElement("canvas");
-    var quit = false;
+    var quit;
     var alertImg = new Image();
     var entities = {};
     var levelName;
@@ -731,11 +731,12 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
         }
 
         function bindEvents() {
-            // TODO: use native event listeners
+            if (gameCanvas.eventsBound) return;
 
             function onMouse(e) {
                 e.preventDefault();
                 if (e.type === "mousedown") {
+                    console.log("bla");
                     pointerDown = true;
                 } else if (e.type === "mouseup") {
                     pointerDown = false;
@@ -766,6 +767,7 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 if (action) {
                     actions[action] = (e.type == "keydown");
                 }
+
             };
 
             function onResize(e) {
@@ -795,6 +797,8 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
 
             window.addEventListener("resize", onResize, true);
             onResize();
+
+            gameCanvas.eventsBound = true;
         }
 
         function mainloop() {
@@ -814,13 +818,14 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 }
             }
         }
+
     
         quit = false;
         lastUpdate = $_.getTicks();
         outCtx.imageSmoothingEnable = false;
         fbCtx.imageSmoothingEnable = false;
-        bindEvents();
 
+        bindEvents();
         loadEntities(entLayer, mainloop);
     }
 
