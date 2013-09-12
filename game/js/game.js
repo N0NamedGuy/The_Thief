@@ -732,28 +732,24 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
 
         function bindEvents() {
             // TODO: use native event listeners
-            $(gameCanvas).off("mousedown").on("mousedown", function (e) {
+
+            function onMouse(e) {
                 e.preventDefault();
-                pointerDown = true;
-                updatePointer(e);
-                return false;
-            });
-            $(gameCanvas).off("mouseup").on("mouseup", function (e) {
-                e.preventDefault();
-                pointerDown = false;
-                return false;
-            });
-            $(gameCanvas).off("mousemove").on("mousemove", function (e) {
-                e.preventDefault();
+                if (e.type === "mousedown") {
+                    pointerDown = true;
+                } else if (e.type === "mouseup") {
+                    pointerDown = false;
+                    return;
+                }
+
                 if (pointerDown) updatePointer(e);
                 return false;
-            });
+            };
 
-            $(gameCanvas).off("touchmove touchend touchstart")
-                .on("touchmove touchend touchstart", function (e) {
+            function onTouch(e) {
                 e.preventDefault();
 
-                var touches = e.originalEvent.changedTouches;
+                var touches = e.changedTouches;
                 if (touches.length != 1) {
                     return false;
                 }
@@ -761,30 +757,44 @@ require(["lib/util", "lib/jquery", "lib/underscore"], function ($_) {
                 updatePointer(touch);
 
                 return false;
-            });
+            };
 
-            $(window).off("keydown keyup").on("keydown keyup", function (e) {
+            function onKey(e) {
                 e.preventDefault();
+
                 var action = keys[e.keyCode];
                 if (action) {
                     actions[action] = (e.type == "keydown");
                 }
-            });
+            };
 
-            $(window).off("resize").on("resize", function () {
+            function onResize(e) {
                 var w = 640, h = 480;
 
                 framebuffer.width = gameCanvas.width = Math.min(w / camera.scale,
-                    window.innerWidth);
+                    window.innerWidth / camera.scale);
                 framebuffer.height = gameCanvas.height = Math.min(h / camera.scale,
-                    window.innerHeight);
+                    window.innerHeight / camera.scale);
 
                 $(gameCanvas)
                 .css("left", (window.innerWidth - (gameCanvas.width * camera.scale)) / 2)
-                .css("width", (framebuffer.width * camera.scale) + "px")
-                .css("height", (framebuffer.height * camera.scale) + "px");
-            });
-            $(window).trigger("resize");
+                .css("width", (gameCanvas.width * camera.scale) + "px")
+                .css("height", (gameCanvas.height * camera.scale) + "px");
+            };
+
+            gameCanvas.addEventListener("mousedown", onMouse, true);
+            gameCanvas.addEventListener("mouseup", onMouse, true);
+            gameCanvas.addEventListener("mousemove", onMouse, true);
+
+            gameCanvas.addEventListener("touchmove", onTouch, true);
+            gameCanvas.addEventListener("touchend", onTouch, true);
+            gameCanvas.addEventListener("touchstart", onTouch, true);
+
+            window.addEventListener("keydown", onKey, true);
+            window.addEventListener("keyup", onKey, true);
+
+            window.addEventListener("resize", onResize, true);
+            onResize();
         }
 
         function mainloop() {
