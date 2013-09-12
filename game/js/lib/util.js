@@ -65,7 +65,6 @@ define(["lib/underscore"], function util() {
     };
 
     $_.loadImages = function (pathsObj, callback) {
-        console.log(_);
         var pairs = _.pairs(pathsObj);
 
         return this.loadResources(pairs, function (pair, loadedfun) {

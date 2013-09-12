@@ -232,6 +232,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
     function bindEvents() {
         function onMouse(e) {
             e.preventDefault();
+
             if (e.type === "mousedown") {
                 pointerDown = true;
             } else if (e.type === "mouseup") {
@@ -239,7 +240,7 @@ require(["lib/util", "lib/underscore"], function ($_) {
                 return;
             }
 
-            updatePointer(e);
+            if (pointerDown) updatePointer(e);
             return false;
         }
 
