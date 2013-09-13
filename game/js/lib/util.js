@@ -97,7 +97,18 @@ define(["lib/underscore"], function util() {
             obj[pair[0]] = pair[1]; 
             return obj;
         }, {});
-    }
+    };
+
+    $_.toXY = function (index, width) {
+        return {
+            x: index % width,
+            y: Math.floor(index / width)
+        };
+    };
+
+    $_.fromXY = function (x, y, th, tw, width) {
+        return (Math.floor(y / th) * width) + Math.floor(x / tw);
+    };
 
     /* From: http://stackoverflow.com/a/646643 */
     if (typeof String.prototype.startsWith != 'function') {
