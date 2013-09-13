@@ -1,37 +1,50 @@
 define(["lib/util", "lib/underscore"], function (Util) {
     "use strict";
-    var Map = function (filename, canvas) {
-        var bgCanvas = document.createElement("canvas");
-        var fgCanvas = document.createElement("canvas");
-        var bgCtx, fgCtx;
-        var map;
+    var Map = function () {};
 
-        Util.getJSON(json, function (map) {
-            this.map = map;
-            fgCanvas.width = bgCanvas.width = map.width * map.tileheight;
-            fgCanvas.height = bgCanvas.height = map.height * map.tilewidth;
-            fgCanvas.dirty = bgCanvas.dirty = true;
+    Map.prototype.loadTileset = function (tileset, loadedFun) {
+        var img = new Image();
 
-            bgCtx = bgCanvas.getContext("2d");
-            fgCtx = fgCanvas.getContext("2d");
-            bgCtx.imageSmoothingEnabled = false;
-            fgCtx.imageSmoothingEnabled = false;
+        img.onload = loadedFun;
 
-            if (typeof this.onload === "function") {
-                this.onload(newMap);
-            }
-        });
+        img.src = "maps/" + tileset.image;
+        tileset.img = img;
+
+        return tileset;
     };
 
-    map.prototype.toXY = function (index) {
+    Map.prototype.load = function (filename, cb) {
+        Util.getJSON(filename, function (mapJSON, map) {
+            map.map = mapJSON;
+
+            map.tilewidth = mapJSON.tilewidth;
+            map.tileheight = mapJSON.tileheight;
+            map.properties = mapJSON.properties;
+
+            /* Load tilesets */
+            Util.loadAsynch(mapJSON.tilesets, map.loadTileset, function (tilesets) {
+                map.bgLayer = map.getLayer("background");
+                map.fgLayer = map.getLayer("foreground");
+
+                map.map.tilesets = map.tilesets = tilesets;
+                
+                if (typeof cb === "function") {
+                    cb(map);
+                }
+            });
+        }, this);
+
+    };
+
+    Map.prototype.toXY = function (index) {
         return Util.toXY(index, this.width);
     };
 
-    map.prototype.fromXY = function (x, y) {
+    Map.prototype.fromXY = function (x, y) {
         return Util.fromXY(x, y, this.tilewidth, this.tileheight, this.width);
     };
 
-    map.prototype.findTileset = function (gid) {
+    Map.prototype.findTileset = function (gid) {
         var tilesets = _.filter(this.map.tilesets, function (tileset) {
             return gid >= tileset.firstgid;
         });
@@ -45,15 +58,15 @@ define(["lib/util", "lib/underscore"], function (Util) {
         });
     };
 
-    map.prototype.drawTileLayer = function (layer, ctx) {
-        for (var i = 0; i < layer.data.length; i++) {
-            var gid = layer.data[i];
+    Map.prototype.drawTileLayer = function (layer, ctx) {
+        _.each(layer.data, function(gid, i) {
             var xy = this.toXY(i);
 
             var tileset = this.findTileset(gid);
+            console.log("Tileset", tileset);
 
-            if (tileset) {
-                var txy = toXY(gid - tileset.firstgid,
+            if (typeof tileset !== "undefined") {
+                var txy = Util.toXY(gid - tileset.firstgid,
                         tileset.imagewidth / tileset.tilewidth);
 
                 ctx.drawImage(tileset.img,
@@ -66,26 +79,32 @@ define(["lib/util", "lib/underscore"], function (Util) {
                     tileset.tilewidth,
                     tileset.tileheight);
             }
+        }, this);
+    };
+
+    Map.prototype.drawTileLayerCached = function (layer, ctx) {
+        var canvas = layer.canvas;
+        var ctx = layer.ctx;
+        if (typeof canvas === "undefined") {
+            canvas = document.createElement("canvas");
+            canvas.width = this.map.width * this.map.tilewidth;
+            canvas.height = this.map.height * this.map.tileheight;
+            canvas.dirty = true;
+            ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = false;
+
+            layer.canvas = canvas;
+            layer.ctx = ctx;
         }
-    };
 
-    map.prototype._drawCached = function (layer, cacheCanvas, cacheCtx, ctx) {
-        if (cacheCanvas.dirty) {
-            this.drawTileLayer(layer, cacheCtx);
-            cacheCtx.dirty = false;
+        if (canvas.dirty) {
+            this.drawTileLayer(layer, ctx);
+            canvas.dirty = false;
         }
-        ctx.drawImage(cacheCanvas, 0, 0);
+        ctx.drawImage(canvas, 0, 0);
     };
 
-    map.prototype.drawBgLayer = function (layer, ctx) {
-        return this._drawCached(layer, this.bgLayer, this.bgCtx, ctx);
-    };
-
-    map.prototype.drawFgLayer = function (layer, ctx) {
-        return this._drawCached(layer, this.fgLayer, this.fgCtx, ctx);
-    };
-
-    map.prototype.drawEntity = function (entities, cam, ctx) {
+    Map.prototype.drawEntity = function (entity, cam, ctx) {
         if (entity.visible === false) return;
 
         var gid = entity.gid;
@@ -104,7 +123,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
             var gid_offset = ent_frame ? ent_frame : 0;
 
-            var txy = toXY((gid + gid_offset) - tileset.firstgid, 
+            var txy = Util.toXY((gid + gid_offset) - tileset.firstgid, 
                 tileset.imagewidth / tileset.tilewidth);
 
             ctx.drawImage(tileset.img,

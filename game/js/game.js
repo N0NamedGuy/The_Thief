@@ -1,8 +1,9 @@
 require(["lib/util",
         "assets",
+        "map",
         "lib/underscore"],
 
-function (Util, Assets, __) {
+function (Util, Assets, Map, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -45,166 +46,6 @@ function (Util, Assets, __) {
         offy: undefined,
         scale: 2
     };
-
-    function loadTileset(tileset, loadedFun) {
-        var img = new Image();
-
-        img.onload = loadedFun;
-
-        img.src = "maps/" + tileset.image;
-        tileset.img = img;
-
-        return tileset;
-    }
-
-    function loadMap(json, callback) {
-        var map = json;
-
-        /* Load tilesets */
-        Util.loadAsynch(map.tilesets, loadTileset, function () {
-            callback(map);
-        });
-    }
-
-    function toXY(index, width) {
-        return {
-            x: index % width,
-            y: Math.floor(index / width)
-        };
-    }
-
-    function fromXY(x, y, th, tw, width) {
-        return (Math.floor(y / th) * width) + Math.floor(x / tw);
-    }
-
-    function prepareMap(map) {
-        var bgCanvas = document.createElement("canvas");
-        bgCanvas.width = map.width * map.tileheight;
-        bgCanvas.height = map.height * map.tilewidth;
-        bgCanvas.dirty = true;
-        map._bgCanvas = bgCanvas;
-
-        map.toXY = function (index) {
-            return toXY(index, this.width);
-        };
-
-        map.fromXY = function (x, y) {
-            return fromXY(x, y, this.tilewidth, this.tileheight, this.width);
-        };
-
-        map.findTileset = function(gid) {
-            var tilesets = _.filter(this.tilesets, function (tileset) {
-                return gid >= tileset.firstgid;
-            });
-
-            if (tilesets.length === 0) {
-                return undefined;
-            }
-
-            return _.max(tilesets, function (tileset) {
-                return tileset.firstgid;
-            });
-        };
-
-        map._drawTileLayer = function(layer, ctx) {
-            for (var i = 0; i < layer.data.length; i++) {
-                var gid = layer.data[i];
-                var xy = this.toXY(i);
-
-                var tileset = this.findTileset(gid);
-
-                if (tileset) {
-                    var txy = toXY(gid - tileset.firstgid,
-                            tileset.imagewidth / tileset.tilewidth);
-
-                    ctx.drawImage(tileset.img,
-                        txy.x * tileset.tilewidth,
-                        txy.y * tileset.tileheight,
-                        tileset.tilewidth,
-                        tileset.tileheight,
-                        Math.floor(xy.x * this.tilewidth),
-                        Math.floor(xy.y * this.tileheight),
-                        tileset.tilewidth,
-                        tileset.tileheight);
-                }
-            }
-        };
-
-        map.drawTileLayer = function (layer, ctx) {
-            var bgCanvas = map._bgCanvas;
-            var nctx = bgCanvas.getContext("2d");
-            nctx.imageSmoothingEnabled = false;
-            if (bgCanvas.dirty) {
-                map._drawTileLayer(layer, nctx);
-                map._bgCanvas.dirty = false;
-            }
-            ctx.drawImage(bgCanvas, 0, 0);
-        };
-
-        map.drawEntity = function(entity, cam, ctx) {
-            if (entity.visible === false) {
-                return;
-            }
-
-            var gid = entity.gid;
-            var tileset = this.findTileset(gid);
-
-            var real_x = entity.x - cam.offx;
-            var real_y = entity.y - cam.offx;
-            var ew2 = entity.width / 2;
-            var eh2 = entity.height / 2;
-
-            if (tileset) {
-                var ent_poses = entity.poses;
-                var ent_pose = ent_poses ? ent_poses[entity.anim.pose] : undefined;
-                var ent_frames = ent_pose ? ent_pose.frames : undefined;
-                var ent_frame = ent_frames ? ent_frames[entity.anim.frame % ent_frames.length] : undefined;
-
-                var gid_offset = ent_frame ? ent_frame : 0;
-
-                var txy = toXY((gid + gid_offset) - tileset.firstgid, 
-                    tileset.imagewidth / tileset.tilewidth);
-
-                ctx.drawImage(tileset.img,
-                    txy.x * tileset.tilewidth,
-                    txy.y * tileset.tileheight,
-                    tileset.tilewidth,
-                    tileset.tileheight,
-                    Math.floor(entity.x - ew2),
-                    Math.floor(entity.y - eh2),
-                    tileset.tilewidth,
-                    tileset.tileheight);
-
-                if (entity.alerted) {
-                    ctx.drawImage(Assets.images.alerted,
-                        Math.floor(entity.x - ew2),
-                        Math.floor(entity.y - eh2) - map.tileheight);
-                }
-            }
-        };
-
-        map.getLayer = function(name) {
-            return _.find(this.layers, function (layer) {
-                return layer.name === name;
-            });
-        };
-
-        // Returns tile properties
-        map.getTileProps = function(layer, x, y) {
-            var index = this.fromXY(x, y); 
-            var gid = layer.data[index];
-
-            if (!gid) return null;
-            var tileset = this.findTileset(gid);
-            if (!tileset) return null;
-            gid -= tileset.firstgid;
-
-            var props = tileset.tileproperties;
-            return props[gid];
-        };
-
-        return map;
-    }
 
     // TODO: deprecate this function
     function playAudio(audio) {
@@ -295,15 +136,12 @@ function (Util, Assets, __) {
 
     function loadLevel(filename, callback) {
         quit = true;
-        Util.getJSON("maps/" + filename, function (json) {
-            loadMap(json, function (map) {
-                var newMap = prepareMap(map);
-                levelName = filename;
 
-                if (callback) callback();
-
-                playGame(newMap);
-            });
+        var map = new Map();
+        map.load("maps/" + filename, function () {
+            levelName = filename;
+            if (typeof callback === "function") callback();
+            playGame(map);
         });
     }
 
@@ -635,7 +473,6 @@ function (Util, Assets, __) {
         function preparePlayer(entity, map) {
             var player = prepareEntity(entity, map);
 
-
             player.reset = function () {
                 this.treasures = 0;
                 this._reset();
@@ -796,14 +633,14 @@ function (Util, Assets, __) {
         function renderGame() {
             fbCtx.clearRect(0, 0, framebuffer.width, framebuffer.height); 
             fbCtx.save();
-            //fbCtx.scale(camera.scale, camera.scale);
             fbCtx.translate(
                     Math.floor(camera.offx),
                     Math.floor(camera.offy)
             );
 
+
             map.drawTileLayer(bgLayer, fbCtx);
-            //map._drawTileLayer(aiLayer, fbCtx);
+            //map.drawTileLayer(aiLayer, fbCtx);
             map.drawEntity(treasure, camera, fbCtx);
             _.each(guards, function (guard) {
                 map.drawEntity(guard, camera, fbCtx);

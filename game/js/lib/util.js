@@ -32,13 +32,13 @@ define(["lib/underscore"], function util() {
         xhr.send(null);
     };
 
-    $_.getJSON = function(req, callback) {
+    $_.getJSON = function(req, callback, ctx) {
         this.getAJAX(req, function (data) {
             if (typeof callback === "function") {
                 if (req !== undefined) {
-                    callback(JSON.parse(data));
+                    callback(JSON.parse(data), ctx);
                 } else {
-                    callback(data);
+                    callback(data, ctx);
                 }
             }
         });
