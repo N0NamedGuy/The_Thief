@@ -138,7 +138,7 @@ function (Util, Assets, Map, __) {
         quit = true;
 
         var map = new Map();
-        map.load("maps/" + filename, function () {
+        map.load("maps/" + filename, function (map) {
             levelName = filename;
             if (typeof callback === "function") callback();
             playGame(map);
@@ -637,7 +637,6 @@ function (Util, Assets, Map, __) {
                     Math.floor(camera.offx),
                     Math.floor(camera.offy)
             );
-
 
             map.drawTileLayer(bgLayer, fbCtx);
             //map.drawTileLayer(aiLayer, fbCtx);
