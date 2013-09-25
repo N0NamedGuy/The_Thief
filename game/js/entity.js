@@ -1,8 +1,15 @@
 define(["lib/util", "lib/underscore"], function (Util) {
     "use strict";
+
+
+    // TODO: add event listeners
+    // Events to support:
+    //
+    // step - When the entity does one step
     var Entity = function (entity, map, ent_data) {
         this.map = map;
         this.entity = entity;
+        this.events = {};
 
         this.width = entity.width;
         this.height = entity.height;
@@ -12,7 +19,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
         this.start = {
             x: this.oldx,
-            y: this.oldy
+            y: this.oldy,
             speed: 0
         };
         this.target = undefined;
@@ -42,7 +49,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
             frame: 0,
             pose: "idle"
         };
-    }
+    };
 
     Entity.prototype.update = function (dt) {
         if (this.target === undefined) return;
@@ -80,7 +87,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
             // Deal with this later
             //if (step_sound) playAudio(step_sound);
         } 
-    }
+    };
 
     Entity.prototype.moveTo = function (x, y, bgLayer) {
         var map = this.map;
@@ -95,7 +102,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
         this.anim.pose = "walking";
 
         return props && props.walkable === "true";
-    }
+    };
 
     Entity.prototype.moveRelative = function (x, y) {
         var properties;
@@ -110,7 +117,37 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
     Entity.prototype.setTarget = function (x, y) {
         this.target = {x: x, y: y};
-    }
+    };
+
+    Entity.prototype.collide = function (other) {
+        var mw2 = this.width / 2;
+        var mh2 = this.height / 2;
+        
+        var ow2 = other.width / 2;
+        var oh2 = other.height / 2;
+
+        var myCorners = [
+            {x: this.x - mw2, y: this.y - mh2}, // TL
+            {x: this.x + mw2, y: this.y - mh2}, // TR
+            {x: this.x - mw2, y: this.y + mh2}, // BL
+            {x: this.x + mw2, y: this.y + mh2}  // BR
+        ];
+
+        var ret = _.all(myCorners, function (corner) {
+            var xOK = (corner.x < (other.x - ow2) || corner.x > (other.x + ow2));
+            var yOK = (corner.y < (other.y - oh2) || corner.y > (other.y + oh2));
+
+            return xOK || yOK;
+        });
+
+        return !ret; 
+    };
+
+    Entity.prototype.hasHitWall = function () {
+        var ret = this.wallHit;
+        this.wallHit = false;
+        return ret;
+    };
 
     return Entity; 
 });
