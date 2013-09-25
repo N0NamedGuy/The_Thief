@@ -1,9 +1,10 @@
 require(["lib/util",
         "assets",
         "map",
+        "entity",
         "lib/underscore"],
 
-function (Util, Assets, Map, __) {
+function (Util, Assets, Map, Entity, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
