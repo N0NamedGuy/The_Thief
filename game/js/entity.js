@@ -6,16 +6,20 @@ define(["lib/util", "lib/underscore"], function (Util) {
     // Events to support:
     //
     // step - When the entity does one step
-    var Entity = function (entity, map, ent_data) {
+    var Entity = function (entity, map, entities_data) {
         this.map = map;
         this.entity = entity;
         this.events = {};
 
+        this.gid = entity.gid;
+        this.type = entity.type;
+        this.visible = entity.visible;
+
         this.width = entity.width;
         this.height = entity.height;
         
-        this.oldx = entity.x + this.width;
-        this.oldy = entity.y - this.height;
+        this.oldx = entity.x + (this.width / 2);
+        this.oldy = entity.y - (this.height / 2);
 
         this.start = {
             x: this.oldx,
@@ -26,13 +30,14 @@ define(["lib/util", "lib/underscore"], function (Util) {
         this.wallHit = false;
         this.properties = entity.properties;
 
+        var ent_data = entities_data[this.type];
         this.poses = ent_data ? ent_data.poses : {};
         this.sounds = ent_data ? ent_data.sounds : {};
 
         this.reset();
     };
 
-    Entity.prototype.reset = function () {
+    Entity.prototype._reset = function () {
         this.x = this.start.x;
         this.y = this.start.y;
         this.target = undefined;
@@ -51,7 +56,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
         };
     };
 
-    Entity.prototype.update = function (dt) {
+    Entity.prototype._update = function (dt, bgLayer) {
         if (this.target === undefined) return;
 
         var speed = this.speed;
@@ -63,7 +68,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
         var nx = this.x + speed * Math.cos(angle) * dt;
         var ny = this.y + speed * Math.sin(angle) * dt;
 
-        this.wallHit = !this.moveTo(nx, ny);
+        this.wallHit = !this.moveTo(nx, ny, bgLayer);
 
         var sdt = speed * dt;
 
@@ -83,11 +88,19 @@ define(["lib/util", "lib/underscore"], function (Util) {
             this.oldy = this.y;
             this.anim.frame++;
 
-            var step_sound = entity.sounds ? entity.sounds.step : undefined;
             // Deal with this later
+            //var step_sound = this.sounds ? this.sounds.step : undefined;
             //if (step_sound) playAudio(step_sound);
         } 
     };
+
+    Entity.prototype.reset = function () {
+        this._reset();
+    }
+
+    Entity.prototype.update = function (dt, bgLayer) {
+        this._update(dt, bgLayer);
+    }
 
     Entity.prototype.moveTo = function (x, y, bgLayer) {
         var map = this.map;
