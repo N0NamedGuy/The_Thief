@@ -391,26 +391,14 @@ function (Util, Assets, Map, Entity, __) {
         }
 
         function processInput(dt) {
-            var dx = 0, dy = 0;
-            if (actions.left) {
-                dx = -1;
-            } else if (actions.right) {
-                dx = 1;
-            }
-
-            if (actions.up) {
-                dy = -1;
-            } else if (actions.down) {
-                dy = 1;
-            }
-
-            if (dx !== 0 || dy !== 0) {
-                player.moveRelative(dx * dt, dy * dt);
-            }
-
             if (pointer) {
                 player.setTarget(pointer.x, pointer.y);
                 if (!pointerDown) pointer = undefined;
+            } else {
+                player.moveRelative(
+                    (actions.left ? -1 : actions.right ? 1 : 0) * dt,
+                    (actions.up ? -1 : actions.down ? 1 : 0) * dt
+                );
             }
         }
 

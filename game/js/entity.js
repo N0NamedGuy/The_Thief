@@ -120,6 +120,8 @@ define(["lib/util", "lib/underscore"], function (Util) {
     Entity.prototype.moveRelative = function (x, y) {
         var properties;
         var speed = 1.0;
+
+        if (x === y && x === 0) return;
         
         properties = this.properties;
         if (properties && properties.speed) {
