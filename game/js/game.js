@@ -2,9 +2,10 @@ require(["lib/util",
         "assets",
         "map",
         "entity",
+        "guard",
         "lib/underscore"],
 
-function (Util, Assets, Map, Entity, __) {
+function (Util, Assets, Map, Entity, Guard, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -214,107 +215,7 @@ function (Util, Assets, Map, Entity, __) {
         };
         
         function prepareGuard(entity, map) {
-            var guard = new Entity(entity, map, entities);
-
-            guard.isFollowing = false;
-
-            if (guard.properties.aiorder) {
-                guard.aiorder = guard.properties.aiorder;
-            } else {
-                guard.aiorder = "stop";
-            }
-
-            if (guard.properties.aifollowdist) {
-                guard.aifollowdist= parseInt(guard.properties.aifollowdist, 10);
-            } else {
-                guard.aifollowdist= 3;
-            }
-            
-            if (guard.properties.aifollowspeed) {
-                guard.aifollowspeed = parseInt(guard.properties.aifollowspeed, 10);
-            } else {
-                guard.aifollowspeed = Math.floor(3 * (player.start.speed / 4));
-            }
-
-            guard.orders = {
-                rand: function (ent, dt) {
-                    if (ent.target === undefined || ent.hasHitWall()) {
-                        var dir = Math.floor(Math.random() * 4);
-                        var amt = Math.floor(Math.random() * 200);
-                        
-                        switch (dir) {
-                        case 0:
-                            ent.setTarget(ent.x + amt, ent.y);
-                            break;
-                        case 1:
-                            ent.setTarget(ent.x - amt, ent.y);
-                            break;
-                        case 2:
-                            ent.setTarget(ent.x, ent.y + amt);
-                            break;
-                        case 3:
-                            ent.setTarget(ent.x, ent.y - amt);
-                            break;
-                        }
-                    }
-                }, pause: function (ent, dt) {
-                    var curTime = Util.getTicks();
-                    if (ent.pauseTime === undefined) {
-                        ent.pauseTime = curTime;
-                    }
-
-                    if (curTime - ent.pauseTime > 1000) {
-                        ent.order = prevOrder; 
-                    }
-                }, left : function (ent, dt) {
-                    ent.moveRelative(-dt, 0);
-                }, right: function (ent, dt) {
-                    ent.moveRelative(dt, 0);
-                }, up : function (ent, dt) {
-                    ent.moveRelative(0, -dt);
-                }, down: function (ent, dt) {
-                    ent.moveRelative(0, dt);
-                }, follow: function (ent, dt) {
-                    ent.setTarget(player.x, player.y);
-                }, stop: function (ent, dt) {
-                }
-            };
-
-            guard.update = function (dt, bgLayer) {
-                var props = this.map.getTileProps(aiLayer, this.x, this.y);
-                
-                // Check distance to player
-                var distX = Math.round(Math.abs(this.x - player.x) / map.tilewidth);
-                var distY = Math.round(Math.abs(this.y - player.y) / map.tileheight);
-                var dist = distX + distY; // Manhattan distance
-                var order = this.aiorder;
-
-                if (this.aifollowdist> 0 && dist <= this.aifollowdist) {
-                    order = "follow";
-                    if (!this.alerted) {
-                        playAudio("alerted");
-                        this.alerted = true;
-                    }
-                    this.speed = this.aifollowspeed;
-
-                } else if (props && props.aiorder) {
-                    this.speed = this.start.speed;
-                    if (this.aiorder !== props.aiorder) {
-                        this.prevOrder = this.aiorder;
-                        this.aiorder = props.aiorder;
-                        order = this.aiorder;
-                    }
-                    this.alerted = false;
-                }
-
-                var fun = this.orders[order];
-                if (fun !== undefined) {
-                    fun(this, dt);
-                }
-
-                this._update(dt, bgLayer);
-            };
-
+            var guard = new Guard(entity, player, map, entities);
             return guard;
         }
 
@@ -430,7 +331,7 @@ function (Util, Assets, Map, Entity, __) {
 
             player.update(dt, bgLayer);
             _.each(guards, function (guard) {
-                guard.update(dt, bgLayer);
+                guard.update(dt, bgLayer, aiLayer);
             });
 
             if (player.collide(treasure)) {
