@@ -99,7 +99,7 @@ define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
         }, left : function (dt) {
             this.moveRelative(-dt, 0);
         }, right: function (dt) {
-            this.moveRelative(0);
+            this.moveRelative(dt, 0);
         }, up : function (dt) {
             this.moveRelative(0, -dt);
         }, down: function (dt) {

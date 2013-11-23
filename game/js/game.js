@@ -213,11 +213,6 @@ function (Util, Assets, Map, Entity, Guard, __) {
                 ctx.restore();
             }
         };
-        
-        function prepareGuard(entity, map) {
-            var guard = new Guard(entity, player, map, entities);
-            return guard;
-        }
 
         function preparePlayer(entity, map) {
             var player = new Entity(entity, map, entities);
@@ -275,7 +270,7 @@ function (Util, Assets, Map, Entity, Guard, __) {
                 treasure = prepareTreasure(treasure, map);
 
                 guards = _.map(guards_, function (guard) {
-                    return prepareGuard(guard, map);
+                    return new Guard(guard, player, map, entities);
                 });
 
                 if (callback) callback();
