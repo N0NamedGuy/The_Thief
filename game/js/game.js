@@ -1,12 +1,13 @@
-require(["lib/util",
-        "assets",
+require(["assets",
         "map",
+        "countdown",
         "entity",
         "player",
         "guard",
+        "lib/util",
         "lib/underscore"],
 
-function (Util, Assets, Map, Entity, Player, Guard, __) {
+function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -53,6 +54,7 @@ function (Util, Assets, Map, Entity, Player, Guard, __) {
     // TODO: deprecate this function
     function playAudio(audio) {
         Assets.audio[audio].play();
+        console.warn("Deprecated function call");
     }
 
     function updatePointer(ev) {
@@ -238,6 +240,7 @@ function (Util, Assets, Map, Entity, Player, Guard, __) {
             };
             return treasure;
         }
+        var countdown = new Countdown(9);
 
         function loadEntities(layer, callback) {
             Util.getJSON("entities.json", function (json) {
