@@ -168,6 +168,17 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
 
         var countdown = new Countdown(9);
 
+        countdown.addEventListener("tick", function () {
+            playAudio("blip");
+        });
+        
+        countdown.addEventListener("timeup", function () {
+            if (countdown.failed) {
+                restartLevel();
+                playAudio("timeup");
+            }
+        });
+
         function loadEntities(layer, callback) {
             Util.getJSON("entities.json", function (json) {
                 entities = json;
@@ -187,8 +198,30 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
                 player = new Player(player, map, entities);
                 goal = new Goal(goal, map, entities);
 
+                goal.addEventListener("open", function () {
+                    countdown.start();
+                    playAudio("goal");
+                });
+
                 guards = _.map(guards_, function (guard) {
-                    return new Guard(guard, player, map, entities);
+                    var guard = new Guard(guard, player, map, entities);
+
+                    guard.addEventListener("alerted", function (e, g) {
+                        if (g.alerted) {
+                            playAudio("alerted");
+                        }
+                    });
+
+                    guard.addEventListener("hit", function () {
+                        playAudio("hit");
+                        restartLevel();
+                    });
+
+                    return guard;
+                });
+
+                player.addEventListener("step", function () {
+                    playAudio("step");
                 });
 
                 if (callback) callback();
@@ -249,32 +282,10 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
 
             if (player.collide(goal)) {
                 goal.open(player);
-
-                // TODO: put this in the open event
-                countdown.start();
-                playAudio("goal");
             }
             
             countdown.update();
             
-            /* Check if timeout */
-            if (countdown.failed) {
-                playAudio("timeup");
-                restartLevel();
-                return;
-            }
-
-            /* Check if any guard hit the thief */
-            var guards_ = _.filter(guards, function (guard) {
-                return player.collide(guard);
-            }); 
-
-            if (guards_.length > 0) {
-                playAudio("hit");
-                restartLevel();
-                return;
-            }
-
             /* Check if thief is on exit */
             var props = map.getTileProps(bgLayer, player.x, player.y);
             if (props && props.isexit && props.isexit === "true") {

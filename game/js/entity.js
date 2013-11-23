@@ -1,4 +1,4 @@
-define(["lib/util", "lib/underscore"], function (Util) {
+define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener) {
     "use strict";
 
 
@@ -36,6 +36,8 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
         this._reset();
     };
+
+    listener(Entity);
 
     Entity.prototype._reset = function () {
         this.x = this.start.x;
@@ -89,8 +91,9 @@ define(["lib/util", "lib/underscore"], function (Util) {
             this.anim.frame++;
 
             // Deal with this later
-            //var step_sound = this.sounds ? this.sounds.step : undefined;
+            var step_sound = this.sounds ? this.sounds.step : undefined;
             //if (step_sound) playAudio(step_sound);
+            if (step_sound) this.dispatchEvent(step_sound);
         } 
     };
 

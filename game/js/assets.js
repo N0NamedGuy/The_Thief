@@ -65,7 +65,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
                     source.type = 'audio/' + type;
                     audio.appendChild(source);
                     return false;
-                };
+                }
             });
 
             return [pair[0], audio];
@@ -81,7 +81,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
                 doneFunc();
                 return true;
             });
-        };
+        }
 
         function audioLoader(doneFunc) {
             Assets.loadAudio(audioAssets, function (loaded) {
@@ -89,7 +89,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
                 doneFunc();
                 return true;
             });
-        };
+        }
 
         Util.runParallel([imageLoader, audioLoader], cb);
     };

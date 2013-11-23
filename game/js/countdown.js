@@ -1,4 +1,4 @@
-define(["lib/util", "lib/underscore"], function (Util) {
+define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener) {
     "use strict";
 
     var Countdown = function (secs) {
@@ -7,6 +7,8 @@ define(["lib/util", "lib/underscore"], function (Util) {
         this.remaining = 0;
         this.lastsecs = secs;
     };
+
+    listener(Countdown);
 
     Countdown.prototype.reset = function () {
         this.startTime = undefined;
@@ -31,14 +33,15 @@ define(["lib/util", "lib/underscore"], function (Util) {
             (cents < 10 ? "0" : "") + cents; 
 
         if (secs != this.lastsecs) {
-            // TODO: event tick
             this.lastsecs = secs;
+            this.dispatchEvent("tick");
         }
 
         if (diff <= 0) {
             diff = 0;
             this.failed = true;
             this.str = "00:00:00";
+            this.dispatchEvent("timeup");
         }
 
         this.remaining = diff;

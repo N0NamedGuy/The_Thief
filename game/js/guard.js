@@ -41,8 +41,8 @@ define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
         if (this.aifollowdist > 0 && dist <= this.aifollowdist) {
             order = "follow";
             if (!this.alerted) {
-                // TODO: trigger alert event here
                 this.alerted = true;
+                this.dispatchEvent("alerted", this);
             }
             this.speed = this.aifollowspeed;
 
@@ -53,12 +53,19 @@ define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
                 this.aiorder = props.aiorder;
                 order = this.aiorder;
             }
-            this.alerted = false;
+            if (this.alerted) {
+                this.alerted = false;
+                this.dispatchEvent("alerted", this);
+            }
         }
 
         var fun = this.orders[order];
         if (fun !== undefined) {
             fun.call(this, dt);
+        }
+
+        if (this.collide(this.player)) {
+            this.dispatchEvent("hit");
         }
 
         this._update(dt, bgLayer);

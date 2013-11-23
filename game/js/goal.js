@@ -23,7 +23,7 @@ define(["lib/util", "entity", "lib/underscore"], function (Util, Entity) {
         player.goals++;
         this.isOpen = true;
 
-        // Event goal reached
+        this.dispatchEvent("open");
     };
 
     return Goal;
