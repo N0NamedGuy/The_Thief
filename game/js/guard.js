@@ -1,8 +1,6 @@
 define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
     "use strict";
 
-            //var guard = new Guard(entity, player, map, entities);
-
     var Guard = function (entity, player, map, entities_data) {
         Entity.call(this, entity, map, entities_data);
 
@@ -109,7 +107,6 @@ define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
         }, stop: function (dt) {
         }
     };
-
 
     return Guard;
     

@@ -2,10 +2,11 @@ require(["lib/util",
         "assets",
         "map",
         "entity",
+        "player",
         "guard",
         "lib/underscore"],
 
-function (Util, Assets, Map, Entity, Guard, __) {
+function (Util, Assets, Map, Entity, Player, Guard, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -214,18 +215,6 @@ function (Util, Assets, Map, Entity, Guard, __) {
             }
         };
 
-        function preparePlayer(entity, map) {
-            var player = new Entity(entity, map, entities);
-
-            player.reset = function () {
-                this.treasures = 0;
-                this._reset();
-            };
-
-            player.reset();
-            return player;
-        }
-
         function prepareTreasure(entity, map) {
             var treasure = new Entity(entity, map, entities);
             treasure.isOpen = false;
@@ -266,7 +255,7 @@ function (Util, Assets, Map, Entity, Guard, __) {
                     return obj.type === "guard";
                 });
 
-                player = preparePlayer(player, map);
+                player = new Player(player, map, entities);
                 treasure = prepareTreasure(treasure, map);
 
                 guards = _.map(guards_, function (guard) {
