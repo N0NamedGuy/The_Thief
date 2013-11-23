@@ -34,7 +34,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
         this.poses = ent_data ? ent_data.poses : {};
         this.sounds = ent_data ? ent_data.sounds : {};
 
-        this.reset();
+        this._reset();
     };
 
     Entity.prototype._reset = function () {
