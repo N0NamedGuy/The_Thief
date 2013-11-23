@@ -4,10 +4,11 @@ require(["assets",
         "entity",
         "player",
         "guard",
+        "goal",
         "lib/util",
         "lib/underscore"],
 
-function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
+function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -162,84 +163,9 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
         var lastUpdate;
 
         var player = {};
-        var treasure = {};
+        var goal = {};
         var guards = [];
 
-        var countdown = {
-            startTime: undefined,
-            failed: false,
-            remaining: 0,
-            lastsecs: 9,
-
-            reset: function () {
-                this.startTime = undefined;
-                this.failed = false;
-            },
-            
-            start: function () {
-                this.startTime = this.curTime = Util.getTicks();
-                this.failed = false;
-            },
-
-            update: function () {
-                if (!this.startTime) return;
-
-                var curTime = Util.getTicks();
-                var diff = (10000) - (curTime - this.startTime);
-
-                var secs = Math.floor(diff / 1000);
-                var cents = Math.floor(diff / 10) % 100;
-                this.str = "00:" + 
-                    (secs < 10 ? "0" : "") + secs + ":" +
-                    (cents < 10 ? "0" : "") + cents; 
-
-                if (secs != this.lastsecs) {
-                    playAudio("blip");
-                    this.lastsecs = secs;
-                }
-
-                if (diff <= 0) {
-                    diff = 0;
-                    this.failed = true;
-                    this.str = "00:00:00";
-                }
-
-                this.remaining = diff;
-            },
-
-            render: function (ctx) {
-                if (!this.startTime) return;
-
-                ctx.save();
-                ctx.font = "bold 12pt monospace";
-                ctx.fillText(this.str, 10, 20);
-                ctx.restore();
-            }
-        };
-
-        function prepareTreasure(entity, map) {
-            var treasure = new Entity(entity, map, entities);
-            treasure.isOpen = false;
-            treasure.properties.closedgid = treasure.gid;
-            
-            treasure.reset = function () {
-                this.isOpen = false;
-                this.visible = true;
-                this.gid = treasure.properties.closedgid;
-                this._reset();
-            };
-
-            treasure.open = function (player) {
-                if (this.isOpen) return;
-                this.visible = false;
-                this.gid = this.opengid;
-                player.treasures++;
-                this.isOpen = true;
-                playAudio("treasure");
-                countdown.start();
-            };
-            return treasure;
-        }
         var countdown = new Countdown(9);
 
         function loadEntities(layer, callback) {
@@ -250,7 +176,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
                     return obj.type === "player";
                 });
 
-                treasure = _.find(layer.objects, function (obj) {
+                goal = _.find(layer.objects, function (obj) {
                     return obj.type === "treasure";
                 });
 
@@ -259,7 +185,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
                 });
 
                 player = new Player(player, map, entities);
-                treasure = prepareTreasure(treasure, map);
+                goal = new Goal(goal, map, entities);
 
                 guards = _.map(guards_, function (guard) {
                     return new Guard(guard, player, map, entities);
@@ -271,7 +197,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
 
         function restartLevel(layer) {
             player.reset();
-            treasure.reset();
+            goal.reset();
             _.each(guards, function (guard) {
                 guard.reset();
             });
@@ -321,8 +247,12 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
                 guard.update(dt, bgLayer, aiLayer);
             });
 
-            if (player.collide(treasure)) {
-                treasure.open(player);
+            if (player.collide(goal)) {
+                goal.open(player);
+
+                // TODO: put this in the open event
+                countdown.start();
+                playAudio("goal");
             }
             
             countdown.update();
@@ -348,7 +278,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
             /* Check if thief is on exit */
             var props = map.getTileProps(bgLayer, player.x, player.y);
             if (props && props.isexit && props.isexit === "true") {
-                if (player.treasures > 0) {
+                if (player.goals > 0) {
                     loadLevel(map.properties.nextmap);
                 }
             }
@@ -364,7 +294,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Util, __) {
 
             map.drawTileLayer(bgLayer, fbCtx);
             //map.drawTileLayer(aiLayer, fbCtx);
-            map.drawEntity(treasure, camera, fbCtx);
+            map.drawEntity(goal, camera, fbCtx);
             _.each(guards, function (guard) {
                 map.drawEntity(guard, camera, fbCtx);
             });

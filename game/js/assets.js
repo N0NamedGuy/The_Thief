@@ -20,9 +20,9 @@ define(["lib/util", "lib/underscore"], function (Util) {
             mpeg: "sfx/timeup.mp3"
         },
 
-        treasure: {
-            ogg: "sfx/treasure.ogg",
-            mpeg: "sfx/treasure.mp3"
+        goal: {
+            ogg: "sfx/goal.ogg",
+            mpeg: "sfx/goal.mp3"
         },
 
         hit: {

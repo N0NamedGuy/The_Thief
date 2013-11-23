@@ -9,7 +9,7 @@ define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
     Player.prototype = Object.create(Entity.prototype);
 
     Player.prototype.reset = function () {
-        this.treasures = 0;
+        this.goals = 0;
         this._reset();
     };
 
