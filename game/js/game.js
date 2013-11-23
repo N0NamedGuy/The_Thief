@@ -15,7 +15,6 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
     var gameCanvas = document.createElement("canvas");
     var bgrender = document.createElement("canvas");
     var quit;
-    var alertImg = new Image();
     var entities = {};
     var levelName;
 

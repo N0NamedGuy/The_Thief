@@ -1,11 +1,6 @@
 define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener) {
     "use strict";
 
-
-    // TODO: add event listeners
-    // Events to support:
-    //
-    // step - When the entity does one step
     var Entity = function (entity, map, entities_data) {
         this.map = map;
         this.entity = entity;

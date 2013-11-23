@@ -1,9 +1,10 @@
-define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
+define(["entity", "lib/util", "lib/underscore"],
+        function (Entity, Util) {
+
     "use strict";
 
     var Guard = function (entity, player, map, entities_data) {
         Entity.call(this, entity, map, entities_data);
-
 
         this.isFollowing = false;
         this.player = player;
