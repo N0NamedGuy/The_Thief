@@ -94,11 +94,11 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
 
     Entity.prototype.reset = function () {
         this._reset();
-    }
+    };
 
     Entity.prototype.update = function (dt, bgLayer) {
         this._update(dt, bgLayer);
-    }
+    };
 
     Entity.prototype.moveTo = function (x, y, bgLayer) {
         var map = this.map;

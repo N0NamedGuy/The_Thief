@@ -19,7 +19,7 @@ function (Assets,
         Goal,
         Input,
         Audio,
-        Util,
+        $_,
         __) {
     "use strict";
 
@@ -99,7 +99,7 @@ function (Assets,
         });
 
         function loadEntities(layer, callback) {
-            Util.getJSON("entities.json", function (entities) {
+            $_.getJSON("entities.json", function (entities) {
                 player = _.find(layer.objects, function (obj) {
                     return obj.type === "player";
                 });
@@ -120,8 +120,8 @@ function (Assets,
                     Audio.play("goal");
                 });
 
-                guards = _.map(guards_, function (guard) {
-                    var guard = new Guard(guard, player, map, entities);
+                guards = _.map(guards_, function (guard_) {
+                    var guard = new Guard(guard_, player, map, entities);
 
                     guard.addEventListener("alerted", function (e, g) {
                         if (g.alerted) {
@@ -164,7 +164,6 @@ function (Assets,
             toFollow.x += (Math.sin(remaining) * 16);
             toFollow.y += (Math.cos(remaining) * 16);
 
-
             // Thanks Aru!
             if (camera.tempx && camera.tempx) {
                 camera.tempx = ((camera.tempx * 5 + toFollow.x) / 6);
@@ -177,9 +176,6 @@ function (Assets,
             camera.offx = ((gameCanvas.width / 2) - camera.tempx);
             camera.offy = ((gameCanvas.height / 2) - camera.tempy);
             
-            //camera.offx = ((gameCanvas.width / 2 / camera.scale) - camera.tempx);
-            //camera.offy = ((gameCanvas.height / 2 / camera.scale) - camera.tempy);
-
             player.update(dt, bgLayer);
             _.each(guards, function (guard) {
                 guard.update(dt, bgLayer, aiLayer);
@@ -225,7 +221,7 @@ function (Assets,
         }
 
         function mainloop() {
-            var curTime = Util.getTicks();
+            var curTime = $_.getTicks();
             var dt = (curTime - lastUpdate) / 60;
 
             input.process(dt);
@@ -244,7 +240,7 @@ function (Assets,
 
         (function init() {
             quit = false;
-            lastUpdate = Util.getTicks();
+            lastUpdate = $_.getTicks();
             outCtx.imageSmoothingEnable = false;
             fbCtx.imageSmoothingEnable = false;
 
@@ -260,10 +256,10 @@ function (Assets,
     }
 
     bindEvents();
-    levelName = Util.getParameterByName("map");
+    levelName = $_.getParameterByName("map");
 
     levelName = (levelName === "") ? "intro.json" : levelName;
-    Util("container").appendChild(gameCanvas);
+    $_("container").appendChild(gameCanvas);
     
     Assets.load(function () {
         Audio.load(Assets);

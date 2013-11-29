@@ -49,7 +49,7 @@ define(["lib/util"], function ($_) {
             x: (offset.left / cam.scale) - cam.offx,
             y: (offset.top / cam.scale) - cam.offy
         };
-    }
+    };
 
     Input.prototype.onMouse = function (e) {
         e.preventDefault();
@@ -63,7 +63,7 @@ define(["lib/util"], function ($_) {
 
         if (this.pointerDown) this.updatePointer(e);
         return false;
-    }
+    };
 
     Input.prototype.onTouch = function (e) {
         e.preventDefault();
@@ -76,7 +76,7 @@ define(["lib/util"], function ($_) {
         this.updatePointer(touch);
 
         return false;
-    }
+    };
 
     Input.prototype.onKey = function (e) {
         e.preventDefault();
@@ -85,7 +85,7 @@ define(["lib/util"], function ($_) {
         if (action) {
             this.actions[action] = (e.type === "keydown");
         }
-    }
+    };
 
     Input.prototype.unbindEvents = function (e) {
         var canvas = this.canvas;
@@ -108,7 +108,7 @@ define(["lib/util"], function ($_) {
                 $_.decorateEvent(this, this.onKey), true);
         window.removeEventListener("keyup",
                 $_.decorateEvent(this, this.onKey), true);
-    }
+    };
 
     Input.prototype.bindEvents = function (e) {
         var canvas = this.canvas;
@@ -131,8 +131,7 @@ define(["lib/util"], function ($_) {
                 $_.decorateEvent(this, this.onKey), true);
         window.addEventListener("keyup",
                 $_.decorateEvent(this, this.onKey), true);
-    }
-
+    };
 
     Input.prototype.process = function (dt) {
         var pointer = this.pointer;
@@ -146,7 +145,7 @@ define(["lib/util"], function ($_) {
                 (this.actions.up ? -1 : this.actions.down ? 1 : 0) * dt
             );
         }
-    }
+    };
 
     return Input;
 });
