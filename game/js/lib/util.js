@@ -110,6 +110,12 @@ define(["lib/underscore"], function util() {
         return (Math.floor(y / th) * width) + Math.floor(x / tw);
     };
 
+    $_.decorateEvent = function (ctx, fun) {
+        return function onEv(ev) {
+            fun.call(ctx, ev);
+        }
+    };
+
     /* From: http://stackoverflow.com/a/646643 */
     if (typeof String.prototype.startsWith != 'function') {
         // see below for better implementation!

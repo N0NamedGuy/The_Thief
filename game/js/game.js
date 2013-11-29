@@ -5,104 +5,40 @@ require(["assets",
         "player",
         "guard",
         "goal",
+        "input",
         "audio",
         "lib/util",
         "lib/underscore"],
 
-function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Audio, Util, __) {
+function (Assets,
+        Map,
+        Countdown,
+        Entity,
+        Player,
+        Guard,
+        Goal,
+        Input,
+        Audio,
+        Util,
+        __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
     var gameCanvas = document.createElement("canvas");
     var bgrender = document.createElement("canvas");
     var quit;
-    var entities = {};
+    var input;
     var levelName;
-
-    var actions = {
-        "up": false,
-        "down": false,
-        "left": false,
-        "right": false
-    };
-    var keys = {
-        // WASD
-        87: "up",
-        65: "left",
-        83: "down",
-        68: "right",
-
-        // Arrows
-        38: "up",
-        37: "left",
-        40: "down",
-        39: "right",
-
-        // ZQSD
-        90: "up",
-        81: "left"
-    };
-    var pointer;
-    var pointerDown = false;
-    var updatePointerFun;
 
     var camera = {
         offx: undefined,
         offy: undefined,
         scale: 2
     };
-
-    function updatePointer(ev) {
-        var off = gameCanvas.getBoundingClientRect();
-        var offset = {
-            left: ev.pageX - off.left,
-            top: ev.pageY - off.top
-        };
-
-        pointer = {
-            x: (offset.left / camera.scale) - camera.offx,
-            y: (offset.top / camera.scale) - camera.offy
-        };
-    }
+        
 
     function bindEvents() {
-        function onMouse(e) {
-            e.preventDefault();
 
-            if (e.type === "mousedown") {
-                pointerDown = true;
-            } else if (e.type === "mouseup") {
-                pointerDown = false;
-                return;
-            }
-
-            if (pointerDown) updatePointer(e);
-            return false;
-        }
-
-        function onTouch(e) {
-            e.preventDefault();
-
-            var touches = e.changedTouches;
-            if (touches.length != 1) {
-                return false;
-            }
-            var touch = touches[0];
-            updatePointer(touch);
-
-            return false;
-        }
-
-        function onKey(e) {
-            e.preventDefault();
-
-            var action = keys[e.keyCode];
-            if (action) {
-                actions[action] = (e.type == "keydown");
-            }
-
-        }
-        
         function onResize(e) {
             var w = 640, h = 480;
             var style = gameCanvas.style;
@@ -118,17 +54,6 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Audio, Util, __) 
             style.width = (gameCanvas.width * camera.scale) + "px";
             style.height = (gameCanvas.height * camera.scale) + "px";
         }
-
-        gameCanvas.addEventListener("mousedown", onMouse, true);
-        gameCanvas.addEventListener("mouseup", onMouse, true);
-        gameCanvas.addEventListener("mousemove", onMouse, true);
-
-        gameCanvas.addEventListener("touchmove", onTouch, true);
-        gameCanvas.addEventListener("touchend", onTouch, true);
-        gameCanvas.addEventListener("touchstart", onTouch, true);
-
-        window.addEventListener("keydown", onKey, true);
-        window.addEventListener("keyup", onKey, true);
 
         window.addEventListener("resize", onResize, true);
         onResize();
@@ -174,9 +99,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Audio, Util, __) 
         });
 
         function loadEntities(layer, callback) {
-            Util.getJSON("entities.json", function (json) {
-                entities = json;
-
+            Util.getJSON("entities.json", function (entities) {
                 player = _.find(layer.objects, function (obj) {
                     return obj.type === "player";
                 });
@@ -229,18 +152,6 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Audio, Util, __) 
                 guard.reset();
             });
             countdown.reset();
-        }
-
-        function processInput(dt) {
-            if (pointer) {
-                player.setTarget(pointer.x, pointer.y);
-                if (!pointerDown) pointer = undefined;
-            } else {
-                player.moveRelative(
-                    (actions.left ? -1 : actions.right ? 1 : 0) * dt,
-                    (actions.up ? -1 : actions.down ? 1 : 0) * dt
-                );
-            }
         }
 
         function processLogic(dt) {
@@ -317,7 +228,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Audio, Util, __) 
             var curTime = Util.getTicks();
             var dt = (curTime - lastUpdate) / 60;
 
-            processInput(dt);
+            input.process(dt);
             processLogic(dt);
             renderGame();
 
@@ -331,15 +242,21 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Audio, Util, __) 
             }
         }
 
-        function init() {
+        (function init() {
             quit = false;
             lastUpdate = Util.getTicks();
             outCtx.imageSmoothingEnable = false;
             fbCtx.imageSmoothingEnable = false;
 
-            loadEntities(entLayer, mainloop);
-        }
-        init();
+            loadEntities(entLayer, function () {
+                if (input) {
+                    input.unbindEvents();
+                }
+                input = new Input(gameCanvas, camera, player);
+                input.bindEvents();
+                mainloop();
+            });
+        })();
     }
 
     bindEvents();
