@@ -5,10 +5,11 @@ require(["assets",
         "player",
         "guard",
         "goal",
+        "audio",
         "lib/util",
         "lib/underscore"],
 
-function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
+function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Audio, Util, __) {
     "use strict";
 
     var framebuffer = document.createElement("canvas");
@@ -50,12 +51,6 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
         offy: undefined,
         scale: 2
     };
-
-    // TODO: deprecate this function
-    function playAudio(audio) {
-        Assets.audio[audio].play();
-        console.warn("Deprecated function call");
-    }
 
     function updatePointer(ev) {
         var off = gameCanvas.getBoundingClientRect();
@@ -168,13 +163,13 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
         var countdown = new Countdown(9);
 
         countdown.addEventListener("tick", function () {
-            playAudio("blip");
+            Audio.play("blip");
         });
         
         countdown.addEventListener("timeup", function () {
             if (countdown.failed) {
                 restartLevel();
-                playAudio("timeup");
+                Audio.play("timeup");
             }
         });
 
@@ -199,7 +194,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
 
                 goal.addEventListener("open", function () {
                     countdown.start();
-                    playAudio("goal");
+                    Audio.play("goal");
                 });
 
                 guards = _.map(guards_, function (guard) {
@@ -207,12 +202,12 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
 
                     guard.addEventListener("alerted", function (e, g) {
                         if (g.alerted) {
-                            playAudio("alerted");
+                            Audio.play("alerted");
                         }
                     });
 
                     guard.addEventListener("hit", function () {
-                        playAudio("hit");
+                        Audio.play("hit");
                         restartLevel();
                     });
 
@@ -220,7 +215,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
                 });
 
                 player.addEventListener("step", function () {
-                    playAudio("step");
+                    Audio.play("step");
                 });
 
                 if (callback) callback();
@@ -354,6 +349,7 @@ function (Assets, Map, Countdown, Entity, Player, Guard, Goal, Util, __) {
     Util("container").appendChild(gameCanvas);
     
     Assets.load(function () {
+        Audio.load(Assets);
         loadLevel(levelName);
     });
 });
