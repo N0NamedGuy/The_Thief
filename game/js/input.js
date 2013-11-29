@@ -7,6 +7,7 @@ define(["lib/util"], function ($_) {
         "left": false,
         "right": false
     };
+
     var keys = {
         // WASD
         87: "up",
@@ -32,6 +33,7 @@ define(["lib/util"], function ($_) {
         this.player = player;
 
         this.pointer = undefined;
+        this.actions = Object.create(actions);
     };
 
     Input.prototype.updatePointer = function(ev) {
@@ -56,6 +58,7 @@ define(["lib/util"], function ($_) {
             this.pointerDown = true;
         } else if (e.type === "mouseup") {
             this.pointerDown = false;
+            return false;
         }
 
         if (this.pointerDown) this.updatePointer(e);
@@ -80,11 +83,11 @@ define(["lib/util"], function ($_) {
 
         var action = keys[e.keyCode];
         if (action) {
-            actions[action] = (e.type === "keydown");
+            this.actions[action] = (e.type === "keydown");
         }
     }
 
-    Input.prototype.undbindEvents = function (e) {
+    Input.prototype.unbindEvents = function (e) {
         var canvas = this.canvas;
 
         canvas.removeEventListener("mousedown",
@@ -136,11 +139,11 @@ define(["lib/util"], function ($_) {
 
         if (this.pointer) {
             this.player.setTarget(pointer.x, pointer.y);
-            if (!this.pointerDown) pointer = undefined;
+            if (!this.pointerDown) this.pointer = undefined;
         } else {
             this.player.moveRelative(
-                (actions.left ? -1 : actions.right ? 1 : 0) * dt,
-                (actions.up ? -1 : actions.down ? 1 : 0) * dt
+                (this.actions.left ? -1 : this.actions.right ? 1 : 0) * dt,
+                (this.actions.up ? -1 : this.actions.down ? 1 : 0) * dt
             );
         }
     }
