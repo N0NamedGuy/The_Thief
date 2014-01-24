@@ -31,7 +31,7 @@ define(["entity", "lib/util", "lib/underscore"],
     Guard.prototype = Object.create(Entity.prototype);
 
     Guard.prototype.update = function (dt, bgLayer, aiLayer) {
-        var props = this.map.getTileProps(aiLayer, this.x, this.y);
+        var props = aiLayer.getProperties(this.x, this.y);
         
         // Check distance to player
         var distX = Math.round(Math.abs(this.x - this.player.x) / this.map.tilewidth);

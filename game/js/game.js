@@ -188,7 +188,7 @@ function (Assets,
             countdown.update();
             
             /* Check if thief is on exit */
-            var props = map.getTileProps(bgLayer, player.x, player.y);
+            var props = bgLayer.getProperties(player.x, player.y);
             if (props && props.isexit && props.isexit === "true") {
                 if (player.goals > 0) {
                     loadLevel(map.properties.nextmap);

@@ -103,13 +103,13 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
     Entity.prototype.moveTo = function (x, y, bgLayer) {
         var map = this.map;
 
-        var props = map.getTileProps(bgLayer, this.x, y);
+        var props = bgLayer.getProperties(this.x, y);
         if (props && props.walkable === "true") this.y = y;
 
-        props = map.getTileProps(bgLayer, x, this.y);
+        props = bgLayer.getProperties(x, this.y);
         if (props && props.walkable === "true") this.x = x;
 
-        props = map.getTileProps(bgLayer, x, y);
+        props = bgLayer.getProperties(x, y);
         this.anim.pose = "walking";
 
         return props && props.walkable === "true";
