@@ -20,7 +20,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
     };
 
-    Layer.prototype._draw = function (ctx) {
+    Layer.prototype._drawTiled = function (ctx) {
         var c = 0;
         var map = this.map;
 
@@ -51,18 +51,26 @@ define(["lib/util", "lib/underscore"], function (Util) {
         }
     };
 
-    Layer.prototype.draw = function (ctx) {
-        // TODO: Check if layer type is "tilelayer" or "objectgroup"
-
+    Layer.prototype.drawTiled = function (ctx) {
         var canvas = this.canvas;
         var cachedctx = this.ctx;
 
         if (canvas.dirty) {
-            this._draw(cachedctx);
+            this._drawTiled(cachedctx);
             canvas.dirty = false;
         }
         ctx.drawImage(canvas, 0, 0);
     };
+
+    Layer.prototype.draw = function (ctx) {
+        if (this.visible === false) return;
+
+        if (this.type === "tilelayer") {
+            this.drawTiled(ctx);
+        } else if (this.type === "objectgroup") {
+            // FIXME: find way to put entity drawing right here
+        }
+    }
 
     Layer.prototype.getProperties = function (x, y) {
         var map = this.map;

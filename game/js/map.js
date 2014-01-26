@@ -62,6 +62,12 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
         });
     };
 
+    Map.prototype.draw = function (ctx) {
+        _.each(this.layers, function (layer) {
+            layer.draw(ctx);
+        });
+    };
+
     Map.prototype.drawTileLayer = function (layer, ctx) {
         layer.draw(ctx);
     };

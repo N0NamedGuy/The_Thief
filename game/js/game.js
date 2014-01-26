@@ -204,8 +204,9 @@ function (Assets,
                     Math.floor(camera.offy)
             );
 
-            map.drawTileLayer(bgLayer, fbCtx);
-            //map.drawTileLayer(aiLayer, fbCtx);
+            map.draw(fbCtx);
+            
+            // TODO: all entity drawing should be handled by the layer (if the layer's type is "objectgroup")
             map.drawEntity(goal, camera, fbCtx);
             _.each(guards, function (guard) {
                 map.drawEntity(guard, camera, fbCtx);
