@@ -35,6 +35,10 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
                 }
             });
         }, this);
+    };
+
+    // TODO: make entity loading happen here
+    Map.prototype.loadEntities = function () {
 
     };
 

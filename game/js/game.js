@@ -87,17 +87,6 @@ function (Assets,
 
         var countdown = new Countdown(9);
 
-        countdown.addEventListener("tick", function () {
-            Audio.play("blip");
-        });
-        
-        countdown.addEventListener("timeup", function () {
-            if (countdown.failed) {
-                restartLevel();
-                Audio.play("timeup");
-            }
-        });
-
         function loadEntities(layer, callback) {
             $_.getJSON("entities.json", function (entities) {
                 player = _.find(layer.objects, function (obj) {
@@ -248,6 +237,17 @@ function (Assets,
             lastUpdate = $_.getTicks();
             outCtx.imageSmoothingEnable = false;
             fbCtx.imageSmoothingEnable = false;
+
+            countdown.addEventListener("tick", function () {
+                Audio.play("blip");
+            });
+            
+            countdown.addEventListener("timeup", function () {
+                if (countdown.failed) {
+                    restartLevel();
+                    Audio.play("timeup");
+                }
+            });
 
             loadEntities(entLayer, function () {
                 if (input) {
