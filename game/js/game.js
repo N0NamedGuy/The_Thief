@@ -66,11 +66,11 @@ function (Assets,
         map.load("maps/" + filename, function (map) {
             levelName = filename;
             if (typeof callback === "function") callback();
-            playGame(map);
+            newGame(map);
         });
     }
 
-    function playGame(map) {
+    function newGame(map) {
         // Preload some stuff, so we don't need to ask everytime where stuff is
         var outCtx = gameCanvas.getContext('2d');
         var fbCtx = framebuffer.getContext('2d');
@@ -199,6 +199,8 @@ function (Assets,
         function renderGame() {
             fbCtx.clearRect(0, 0, framebuffer.width, framebuffer.height); 
             fbCtx.save();
+
+            // FIXME: move this translate onto map rendering
             fbCtx.translate(
                     Math.floor(camera.offx),
                     Math.floor(camera.offy)
@@ -213,6 +215,8 @@ function (Assets,
             });
 
             map.drawEntity(player, camera, fbCtx);
+            
+            // FIXME: move this restore onto map rendering
             fbCtx.restore();
 
             countdown.render(fbCtx);
