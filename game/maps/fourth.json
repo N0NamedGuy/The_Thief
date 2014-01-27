@@ -17,7 +17,7 @@
          "name":"ai",
          "opacity":0.889999985694885,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":40,
          "x":0,
          "y":0
