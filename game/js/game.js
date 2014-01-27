@@ -89,17 +89,29 @@ function (Assets,
 
         function loadEntities(layer, callback) {
             $_.getJSON("entities.json", function (entities) {
-                player = _.find(layer.objects, function (obj) {
-                    return obj.type === "player";
-                });
 
-                goal = _.find(layer.objects, function (obj) {
-                    return obj.type === "treasure";
-                });
+                function objectFinder(type) {
+                    return function (obj, index) {
+                        if (obj.type === type) {
+                            obj.index = index;
+                            obj.layer = layer;
+                            return true;
+                        }
+                        return false;
+                    }
+                }
 
-                var guards_ = _.select(layer.objects, function (obj) {
-                    return obj.type === "guard";
-                });
+                function findObject(type) {
+                    return _.find(layer.objects, objectFinder(type));
+                }
+                
+                function findObjects(type) {
+                    return _.select(layer.objects, objectFinder(type));
+                }
+
+                player = findObject("player");
+                goal = findObject("treasure");
+                var guards_ = findObjects("guard");
 
                 player = new Player(player, map, entities);
                 goal = new Goal(goal, map, entities);

@@ -3,7 +3,6 @@ define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
 
     var Player = function (entity, map, entities_data) {
         Entity.call(this, entity, map, entities_data);
-        this.reset();
     };
 
     Player.prototype = Object.create(Entity.prototype);

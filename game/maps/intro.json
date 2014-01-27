@@ -80,6 +80,7 @@
  "orientation":"orthogonal",
  "properties":
     {
+     "entities":"..\/entities.json",
      "nextmap":"second.json"
     },
  "tileheight":32,

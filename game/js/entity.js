@@ -1,20 +1,17 @@
 define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener) {
     "use strict";
 
-    var Entity = function (entity, map, entities_data) {
+    var Entity = function (object, map, entities_data) {
         this.map = map;
-        this.entity = entity;
         this.events = {};
 
-        this.gid = entity.gid;
-        this.type = entity.type;
-        this.visible = entity.visible;
+        // Take all the values from the layer object */
+        _.each(object, function (value, key) {
+            this[key] = value;
+        }, this);
 
-        this.width = entity.width;
-        this.height = entity.height;
-        
-        this.oldx = entity.x + (this.width / 2);
-        this.oldy = entity.y - (this.height / 2);
+        this.oldx = this.x + (this.width / 2);
+        this.oldy = this.y - (this.height / 2);
 
         this.start = {
             x: this.oldx,
@@ -23,13 +20,12 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
         };
         this.target = undefined;
         this.wallHit = false;
-        this.properties = entity.properties;
 
         var ent_data = entities_data[this.type];
         this.poses = ent_data ? ent_data.poses : {};
         this.sounds = ent_data ? ent_data.sounds : {};
 
-        this._reset();
+        this.reset();
     };
 
     listener(Entity);
@@ -39,7 +35,6 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
         this.y = this.start.y;
         this.target = undefined;
         this.wallHit = false;
-        this.alerted = undefined;
 
         if (this.properties.speed) {
             this.start.speed = this.speed = this.properties.speed;

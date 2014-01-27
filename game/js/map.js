@@ -15,6 +15,9 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
         return tileset;
     }
 
+    /**
+     *  Loads the map
+     */
     Map.prototype.load = function (filename, cb) {
         Util.getJSON(filename, function (mapJSON, map) {
             _.extend(map, mapJSON);
@@ -35,11 +38,6 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
                 }
             });
         }, this);
-    };
-
-    // TODO: make entity loading happen here
-    Map.prototype.loadEntities = function () {
-
     };
 
     Map.prototype.toXY = function (index) {

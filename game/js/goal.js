@@ -2,8 +2,11 @@ define(["lib/util", "entity", "lib/underscore"], function (Util, Entity) {
     "use strict";
 
     var Goal = function(entity, map, entities) {
+        console.log("Goal Object", entity);
         Entity.call(this, entity, map, entities);
+        console.log("Goal Entity", this);
         this.properties.closedgid = this.gid;
+        console.log(this.properties);
         this.isOpen = false;
     };
 

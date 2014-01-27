@@ -116,6 +116,11 @@ define(["entity", "lib/util", "lib/underscore"],
         }
     };
 
+    Guard.prototype.reset = function () {
+        this.alerted = undefined;
+        this._reset();
+    }
+
     return Guard;
     
 });
