@@ -110,12 +110,7 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
     };
 
     Map.prototype.getLayer = function(name) {
-        return _.find(this.layers, function (layer) {
-            return layer.name === name;
-        });
-
-        // FIXME: use appropriate underscore function to find stuff
-        // return _.pick(this.layers, {name: name});
+        return _.findWhere(this.layers, {name: name});
     };
 
     return Map; 
