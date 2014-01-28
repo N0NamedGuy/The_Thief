@@ -11,6 +11,7 @@ define(["lib/underscore"], function util() {
         }
     };
 
+    // FIXME: write callbacks properly (with call(this, *args) or apply(this, args[]))
     $_.getAJAX = function(req, callback) {
         var xhr = new XMLHttpRequest();
         //xhr.setRequestHeader('Content-Type', 'application/json');

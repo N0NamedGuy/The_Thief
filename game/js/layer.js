@@ -62,13 +62,52 @@ define(["lib/util", "lib/underscore"], function (Util) {
         ctx.drawImage(canvas, 0, 0);
     };
 
+    Layer.prototype.drawObject = function (object, ctx) {
+    }
+
+    Layer.prototype.drawObjects = function (ctx) {
+        function drawObject(object) {
+            if (object.visible === false) return;
+
+            var gid = object.gid;
+            var tileset = this.map.findTileset(gid);
+
+            var ew2 = object.width / 2;
+            var eh2 = object.height / 2;
+
+            if (tileset) {
+                var ent_poses = object.poses;
+                var ent_pose = ent_poses ? ent_poses[object.anim.pose] : undefined;
+                var ent_frames = ent_pose ? ent_pose.frames : undefined;
+                var ent_frame = ent_frames ? ent_frames[object.anim.frame % ent_frames.length] : undefined;
+
+                var gid_offset = ent_frame ? ent_frame : 0;
+
+                var txy = Util.toXY((gid + gid_offset) - tileset.firstgid, 
+                    tileset.imagewidth / tileset.tilewidth);
+
+                ctx.drawImage(tileset.img,
+                    txy.x * tileset.tilewidth,
+                    txy.y * tileset.tileheight,
+                    tileset.tilewidth,
+                    tileset.tileheight,
+                    Math.floor(object.x - ew2),
+                    Math.floor(object.y - eh2),
+                    tileset.tilewidth,
+                    tileset.tileheight);
+                
+            }
+        }
+        _.each(this.objects, drawObject, this);
+    }
+
     Layer.prototype.draw = function (ctx) {
         if (this.visible === false) return;
 
         if (this.type === "tilelayer") {
             this.drawTiled(ctx);
         } else if (this.type === "objectgroup") {
-            // FIXME: find way to put entity drawing right here
+            this.drawObjects(ctx);
         }
     }
 

@@ -63,7 +63,7 @@ function (Assets,
         quit = true;
 
         var map = new Map();
-        map.load("maps/" + filename, function (map) {
+        map.loadJSON("maps/" + filename, function (map) {
             levelName = filename;
             if (typeof callback === "function") callback();
             newGame(map);
@@ -75,9 +75,9 @@ function (Assets,
         var outCtx = gameCanvas.getContext('2d');
         var fbCtx = framebuffer.getContext('2d');
 
-        var bgLayer = map.getLayer("background");
-        var aiLayer = map.getLayer("ai");
-        var entLayer = map.getLayer("entities");
+        var bgLayer = map.findLayer("background");
+        var aiLayer = map.findLayer("ai");
+        var entLayer = map.findLayer("entities");
         
         var lastUpdate;
 
@@ -113,6 +113,7 @@ function (Assets,
                 goal = findObject("treasure");
                 var guards_ = findObjects("guard");
 
+
                 player = new Player(player, map, entities);
                 goal = new Goal(goal, map, entities);
 
@@ -137,6 +138,12 @@ function (Assets,
 
                     return guard;
                 });
+
+                // Augment the layer's objects, so the layer can render them
+                _.each(_.union([player, goal], guards), function (entity) {
+                    entity.layer.objects[entity.index] = entity;
+                });
+                console.log("Augmented layer:", layer);
 
                 player.addEventListener("step", function () {
                     Audio.play("step");
@@ -199,27 +206,9 @@ function (Assets,
         
         function renderGame() {
             fbCtx.clearRect(0, 0, framebuffer.width, framebuffer.height); 
-            fbCtx.save();
 
-            // FIXME: move this translate onto map rendering
-            fbCtx.translate(
-                    Math.floor(camera.offx),
-                    Math.floor(camera.offy)
-            );
-
-            map.draw(fbCtx);
+            map.draw(camera, fbCtx);
             
-            // TODO: all entity drawing should be handled by the layer (if the layer's type is "objectgroup")
-            map.drawEntity(goal, camera, fbCtx);
-            _.each(guards, function (guard) {
-                map.drawEntity(guard, camera, fbCtx);
-            });
-
-            map.drawEntity(player, camera, fbCtx);
-            
-            // FIXME: move this restore onto map rendering
-            fbCtx.restore();
-
             countdown.render(fbCtx);
 
             outCtx.clearRect(0, 0, screen.width, screen.height); 
@@ -244,7 +233,7 @@ function (Assets,
             }
         }
 
-        (function init() {
+        function init() {
             quit = false;
             lastUpdate = $_.getTicks();
             outCtx.imageSmoothingEnable = false;
@@ -269,7 +258,9 @@ function (Assets,
                 input.bindEvents();
                 mainloop();
             });
-        })();
+        }
+
+        init();
     }
 
     bindEvents();
