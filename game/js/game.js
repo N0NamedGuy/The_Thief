@@ -65,7 +65,7 @@ function (Assets,
         var map = new Map();
         map.loadJSON("maps/" + filename, function (map) {
             levelName = filename;
-            if (typeof callback === "function") callback();
+            $_.callback(callback);
             newGame(map);
         });
     }
@@ -149,7 +149,7 @@ function (Assets,
                     Audio.play("step");
                 });
 
-                if (callback) callback();
+                $_.callback(callback);
             });
         }
 

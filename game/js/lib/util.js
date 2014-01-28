@@ -117,6 +117,12 @@ define(["lib/underscore"], function util() {
         }
     };
 
+    $_.callback = function (fun, ctx, args) {
+        if (fun && fun.call) {
+            fun.apply(ctx, args);
+        }
+    }
+
     /* From: http://stackoverflow.com/a/646643 */
     if (typeof String.prototype.startsWith != 'function') {
         // see below for better implementation!

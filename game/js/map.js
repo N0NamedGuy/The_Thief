@@ -27,9 +27,7 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
 
             map.layers = layers;
 
-            if (typeof cb === "function") {
-                cb(map);
-            }
+            $_.callback(cb, this, [map]);
         });
     }
 
