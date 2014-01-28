@@ -69,7 +69,7 @@ define(["entity", "lib/util", "lib/underscore"],
             this.dispatchEvent("hit");
         }
 
-        this._update(dt, bgLayer);
+        return Entity.prototype.update.call(this, dt, bgLayer);
     };
 
     Guard.prototype.orders = {
@@ -118,7 +118,7 @@ define(["entity", "lib/util", "lib/underscore"],
 
     Guard.prototype.reset = function () {
         this.alerted = undefined;
-        this._reset();
+        Entity.prototype.reset.call(this);
     }
 
     return Guard;

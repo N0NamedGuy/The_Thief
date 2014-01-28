@@ -13,7 +13,8 @@ define(["lib/util", "entity", "lib/underscore"], function (Util, Entity) {
         this.isOpen = false;
         this.visible = true;
         this.gid = this.properties.closedgid;
-        this._reset();
+
+        Entity.prototype.reset.call(this);
     };
 
     Goal.prototype.open = function (player) {

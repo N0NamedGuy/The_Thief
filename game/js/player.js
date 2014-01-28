@@ -9,7 +9,7 @@ define(["entity", "lib/util", "lib/underscore"], function (Entity, Util) {
 
     Player.prototype.reset = function () {
         this.goals = 0;
-        this._reset();
+        return Entity.prototype.reset.call(this);
     };
 
     return Player;

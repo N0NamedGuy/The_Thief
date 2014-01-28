@@ -30,7 +30,7 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
 
     listener(Entity);
 
-    Entity.prototype._reset = function () {
+    Entity.prototype.reset = function () {
         this.x = this.start.x;
         this.y = this.start.y;
         this.target = undefined;
@@ -48,7 +48,7 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
         };
     };
 
-    Entity.prototype._update = function (dt, bgLayer) {
+    Entity.prototype.update = function (dt, bgLayer) {
         if (this.target === undefined) return;
 
         var speed = this.speed;
@@ -85,14 +85,6 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
             //if (step_sound) playAudio(step_sound);
             if (step_sound) this.dispatchEvent(step_sound);
         } 
-    };
-
-    Entity.prototype.reset = function () {
-        this._reset();
-    };
-
-    Entity.prototype.update = function (dt, bgLayer) {
-        this._update(dt, bgLayer);
     };
 
     Entity.prototype.moveTo = function (x, y, bgLayer) {
