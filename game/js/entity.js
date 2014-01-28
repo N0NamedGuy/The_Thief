@@ -80,9 +80,7 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
             this.oldy = this.y;
             this.anim.frame++;
 
-            // Deal with this later
             var step_sound = this.sounds ? this.sounds.step : undefined;
-            //if (step_sound) playAudio(step_sound);
             if (step_sound) this.dispatchEvent(step_sound);
         } 
     };
