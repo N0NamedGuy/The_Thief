@@ -1,4 +1,9 @@
-define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener) {
+define(["sprite", 
+        "lib/util",
+        "lib/listener",
+        "lib/underscore"],
+        
+        function (Sprite, Util, listener) {
     "use strict";
 
     var Entity = function (object, map, entities_data) {
@@ -27,6 +32,8 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
 
         this.reset();
     };
+
+    Entity.prototype = Object.create(Sprite.prototype);
 
     listener(Entity);
 
@@ -146,6 +153,38 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
         this.wallHit = false;
         return ret;
     };
+
+    Entity.prototype.draw = function (ctx) {
+        if (!this.visible) return;
+
+        var gid = this.gid;
+        var tileset = this.map.findTileset(gid);
+
+        var ew2 = this.width / 2;
+        var eh2 = this.height / 2;
+
+        if (tileset) {
+            var poses = this.poses;
+            var pose = poses ? poses[this.anim.pose] : undefined;
+            var frames = pose ? pose.frames : undefined;
+            var frame = frames ? frames[this.anim.frame % frames.length] : undefined;
+
+            var gidOffset = frame ? frame : 0;
+
+            var txy = Util.toXY(gid + gidOffset - tileset.firstgid,
+                    tileset.imagewidth / tileset.tilewidth);
+
+            ctx.drawImage(tileset.img,
+                    txy.x * tileset.tilewidth,
+                    txy.y * tileset.tileheight,
+                    tileset.tilewidth,
+                    tileset.tileheight,
+                    Math.floor(this.x - ew2),
+                    Math.floor(this.y - eh2),
+                    this.width,
+                    this.height);
+        }
+    }
 
     return Entity; 
 });

@@ -84,6 +84,7 @@ function (Assets,
         var player = {};
         var goal = {};
         var guards = [];
+        var alertSprite = {};
 
         var countdown = new Countdown(9);
 
