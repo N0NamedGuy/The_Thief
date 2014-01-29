@@ -5,18 +5,21 @@ define(["lib/underscore"], function () {
         this.visible = false;
         this.img = img;
 
-        this.x = x;
-        this.y = y;
+        this.x = x ? x : 0;
+        this.y = y ? y : 0;
 
-        this.h = h;
-        this.w = w;
+        this.height = h ? h : img.height;
+        this.width = w ? w : img.width;
     };
 
     Sprite.prototype.draw = function (ctx) {
         if (!this.visible) return;
 
         var img = this.img;
-        ctx.draw(this.img, Math.floor(object.x), Math.floor(object.y),
+        ctx.draw(this.img,
+            0, 0,
+            img.width, img.height,
+            Math.floor(this.x), Math.floor(this.y),
             Math.floor(this.w), Math.floor(this.h));
     }
 
