@@ -21,7 +21,7 @@ define(["lib/underscore"], function () {
             img.width, img.height,
             Math.floor(this.x), Math.floor(this.y),
             Math.floor(this.w), Math.floor(this.h));
-    }
+    };
 
     return Sprite;
 });

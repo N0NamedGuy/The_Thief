@@ -13,7 +13,7 @@ define(["sprite", "lib/underscore"], function (Sprite) {
         this.x = target.x + offset.x;
         this.y = target.y + offset.y;
 
-    }
+    };
 
     return FollowSprite;
 });

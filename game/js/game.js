@@ -99,7 +99,7 @@ function (Assets,
                             return true;
                         }
                         return false;
-                    }
+                    };
                 }
 
                 function findObject(type) {

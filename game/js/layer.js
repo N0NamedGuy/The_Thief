@@ -66,7 +66,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
         _.each(this.objects, function (object) {
             object.draw(ctx);
         });
-    }
+    };
 
     Layer.prototype.draw = function (ctx) {
         if (this.visible === false) return;
@@ -76,7 +76,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
         } else if (this.type === "objectgroup") {
             this.drawObjects(ctx);
         }
-    }
+    };
 
     Layer.prototype.getProperties = function (x, y) {
         var map = this.map;

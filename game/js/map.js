@@ -29,7 +29,7 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
 
             $_.callback(cb, this, [map]);
         });
-    }
+    };
 
     Map.prototype.loadJSON = function (filename, cb) {
         Util.getJSON(filename, function (mapJSON, map) {

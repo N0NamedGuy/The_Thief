@@ -184,7 +184,7 @@ define(["sprite",
                     this.width,
                     this.height);
         }
-    }
+    };
 
     return Entity; 
 });

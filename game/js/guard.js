@@ -119,7 +119,7 @@ define(["entity", "lib/util", "lib/underscore"],
     Guard.prototype.reset = function () {
         this.alerted = undefined;
         Entity.prototype.reset.call(this);
-    }
+    };
 
     return Guard;
     
