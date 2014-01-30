@@ -4,14 +4,14 @@ define(["entity", "follow_sprite", "lib/util", "lib/underscore"],
     "use strict";
 
     var Guard = function (entity, player, map, alertImg, entities_data) {
-        Entity.call(this, entity, map, entities_data);
-
-        this.isFollowing = false;
-        this.player = player;
         this.alertedSprite = new FollowSprite(alertImg, this, {
             x: 0,
             y: -alertImg.height
         });
+
+        Entity.call(this, entity, map, entities_data);
+
+        this.player = player;
 
         if (this.properties.aiorder) {
             this.aiorder = this.properties.aiorder;
@@ -134,6 +134,7 @@ define(["entity", "follow_sprite", "lib/util", "lib/underscore"],
 
     Guard.prototype.reset = function () {
         this.alerted = undefined;
+        this.alertedSprite.visible = false;
         Entity.prototype.reset.call(this);
     };
 
