@@ -67,10 +67,8 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
 
     Map.prototype.draw = function (camera, ctx) {
         ctx.save();
-        ctx.translate(
-            Math.floor(camera.offx),
-            Math.floor(camera.offy)
-        );
+
+        camera.transform(ctx);
 
         _.each(this.layers, function (layer) {
             layer.draw(ctx);

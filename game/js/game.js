@@ -7,6 +7,7 @@ require(["assets",
         "goal",
         "input",
         "audio",
+        "camera",
         "lib/util",
         "lib/underscore"],
 
@@ -19,6 +20,7 @@ function (Assets,
         Goal,
         Input,
         Audio,
+        Camera,
         $_,
         __) {
     "use strict";
@@ -30,11 +32,8 @@ function (Assets,
     var input;
     var levelName;
 
-    var camera = {
-        offx: undefined,
-        offy: undefined,
-        scale: 2
-    };
+    var camera;
+    var scale = 2;
         
     function bindEvents() {
 
@@ -42,16 +41,16 @@ function (Assets,
             var w = 640, h = 480;
             var style = gameCanvas.style;
 
-            framebuffer.width = gameCanvas.width = Math.min(w / camera.scale,
-                window.innerWidth / camera.scale);
-            framebuffer.height = gameCanvas.height = Math.min(h / camera.scale,
-                window.innerHeight / camera.scale);
+            framebuffer.width = gameCanvas.width = Math.min(w / scale,
+                window.innerWidth / scale);
+            framebuffer.height = gameCanvas.height = Math.min(h / scale,
+                window.innerHeight / scale);
 
             style.left = ((window.innerWidth - 
-                    (gameCanvas.width * camera.scale)) / 2) + "px";
+                    (gameCanvas.width * scale)) / 2) + "px";
 
-            style.width = (gameCanvas.width * camera.scale) + "px";
-            style.height = (gameCanvas.height * camera.scale) + "px";
+            style.width = (gameCanvas.width * scale) + "px";
+            style.height = (gameCanvas.height * scale) + "px";
         }
 
         window.addEventListener("resize", onResize, true);
@@ -144,11 +143,12 @@ function (Assets,
                 _.each(_.union([player, goal], guards), function (entity) {
                     entity.layer.objects[entity.index] = entity;
                 });
-                console.log("Augmented layer:", layer);
 
                 player.addEventListener("step", function () {
                     Audio.play("step");
                 });
+
+                camera = new Camera(gameCanvas, player, 16, 5, 6);
 
                 $_.callback(callback);
             });
@@ -164,26 +164,8 @@ function (Assets,
         }
 
         function processLogic(dt) {
-            /* Update camera */
-            var toFollow = {
-                x: player.x,
-                y: player.y
-            };
             var remaining = countdown.remaining;
-            toFollow.x += (Math.sin(remaining) * 16);
-            toFollow.y += (Math.cos(remaining) * 16);
-
-            // Thanks Aru!
-            if (camera.tempx && camera.tempx) {
-                camera.tempx = ((camera.tempx * 5 + toFollow.x) / 6);
-                camera.tempy = ((camera.tempy * 5 + toFollow.y) / 6);
-            } else {
-                camera.tempx = toFollow.x;
-                camera.tempy = toFollow.y;
-            }
-
-            camera.offx = ((gameCanvas.width / 2) - camera.tempx);
-            camera.offy = ((gameCanvas.height / 2) - camera.tempy);
+            camera.update(remaining);
             
             player.update(dt, bgLayer);
             _.each(guards, function (guard) {
