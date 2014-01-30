@@ -1,9 +1,12 @@
 define(["sprite", 
         "lib/util",
         "lib/listener",
-        "lib/underscore"],
-        
-function (Sprite, Util, listener) {
+        "lib/underscore"],      
+
+function (Sprite,
+    Util,
+    listener) {
+
     "use strict";
 
     var Entity = function (object, map, entities_data) {
