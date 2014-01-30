@@ -10,7 +10,7 @@ define(["entity", "follow_sprite", "lib/util", "lib/underscore"],
         this.player = player;
         this.alertedSprite = new FollowSprite(alertImg, this, {
             x: 0,
-            y: 0
+            y: -alertImg.height
         });
 
         if (this.properties.aiorder) {
@@ -44,8 +44,8 @@ define(["entity", "follow_sprite", "lib/util", "lib/underscore"],
         var dist = distX + distY; // Manhattan distance
         var order = this.aiorder;
 
+        // FIXME: only dispatch the event. Order setting and extra behaviour (alerted sprite, for instance) should be shown while listening to the alerted event.
         if (this.aifollowdist > 0 && dist <= this.aifollowdist) {
-            // FIXME: only dispatch the event. Order setting and extra behaviour (alerted sprite, for instance) should be shown while listening to the alerted event.
             order = "follow";
             if (!this.alerted) {
                 this.alerted = true;
@@ -65,6 +65,7 @@ define(["entity", "follow_sprite", "lib/util", "lib/underscore"],
             }
             if (this.alerted) {
                 this.alerted = false;
+                this.alertedSprite.visible = false;
                 this.dispatchEvent("alerted", this);
             }
         }
@@ -78,13 +79,13 @@ define(["entity", "follow_sprite", "lib/util", "lib/underscore"],
             this.dispatchEvent("hit");
         }
 
-        this.alertedSprite.update();
         return Entity.prototype.update.call(this, dt, bgLayer);
     };
 
     Guard.prototype.draw = function (ctx) {
+        var ret = Entity.prototype.draw.call(this, ctx);
         this.alertedSprite.draw(ctx);
-        return Entity.prototype.draw.call(this, ctx);
+        return ret;
     }
 
     Guard.prototype.orders = {

@@ -9,11 +9,13 @@ define(["sprite", "lib/underscore"], function (Sprite) {
 
     FollowSprite.prototype = Object.create(Sprite.prototype);
 
-    FollowSprite.prototype.update = function () {
+    FollowSprite.prototype.draw = function (ctx) {
         var target = this.target;
         var offset = this.offset;
         this.x = target.x + offset.x;
         this.y = target.y + offset.y;
+
+        Sprite.prototype.draw.call(this, ctx);
     };
 
     return FollowSprite;
