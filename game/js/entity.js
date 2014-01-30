@@ -181,8 +181,8 @@ define(["sprite",
                     tileset.tileheight,
                     Math.floor(this.x - ew2),
                     Math.floor(this.y - eh2),
-                    this.width,
-                    this.height);
+                    Math.floor(this.width),
+                    Math.floor(this.height));
         }
     };
 
