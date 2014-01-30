@@ -36,7 +36,6 @@ function (Assets,
         scale: 2
     };
         
-
     function bindEvents() {
 
         function onResize(e) {
@@ -124,7 +123,8 @@ function (Assets,
                 });
 
                 guards = _.map(guards_, function (guard_) {
-                    var guard = new Guard(guard_, player, map, entities);
+                    var guard = new Guard(guard_, player, map,
+                        Assets.images["alerted"], entities);
 
                     guard.addEventListener("alerted", function (e, g) {
                         if (g.alerted) {

@@ -16,11 +16,14 @@ define(["lib/underscore"], function () {
         if (!this.visible) return;
 
         var img = this.img;
-        ctx.draw(this.img,
-            0, 0,
-            img.width, img.height,
-            Math.floor(this.x), Math.floor(this.y),
-            Math.floor(this.w), Math.floor(this.h));
+        var w2 = this.width / 2;
+        var h2 = this.height / 2;
+
+        console.log("Sprite pos:", this.x, this.y, img);
+        // FIXME: draw image correctly (if stretched, it should be drawn stretched)
+        ctx.drawImage(this.img,
+            //Math.floor(this.x - w2), Math.floor(this.y - h2));
+            Math.floor(this.x), Math.floor(this.y));
     };
 
     return Sprite;
