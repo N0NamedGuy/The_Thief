@@ -18,6 +18,8 @@ define(["lib/util", "lib/underscore"], function (Util) {
         this.canvas = canvas;
         this.ctx = ctx;
 
+        // caches
+        this.propsCache = {};
     };
 
     Layer.prototype._drawTiled = function (ctx) {
@@ -80,16 +82,22 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
     Layer.prototype.getProperties = function (x, y) {
         var map = this.map;
-        var index = map.fromXY(x, y); 
-        var gid = this.data[index];
+        var index = map.fromXY(x, y);
+        var propsCache = this.propsCache;
 
-        if (!gid) return null;
-        var tileset = map.findTileset(gid);
-        if (!tileset) return null;
-        gid -= tileset.firstgid;
+        if (!(index in propsCache)) {
+            var gid = this.data[index];
 
-        var props = tileset.tileproperties;
-        return props[gid];
+            if (!gid) return null;
+            var tileset = map.findTileset(gid);
+            if (!tileset) return null;
+            gid -= tileset.firstgid;
+
+            var props = tileset.tileproperties;
+            return propsCache[index] = props[gid];
+        }
+
+        return propsCache[index];
     };
 
     return Layer;

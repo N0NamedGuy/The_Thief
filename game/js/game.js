@@ -191,10 +191,8 @@ function (Assets,
             fbCtx.clearRect(0, 0, framebuffer.width, framebuffer.height); 
 
             map.draw(camera, fbCtx);
+            countdown.draw(fbCtx);
             
-            countdown.render(fbCtx);
-
-            outCtx.clearRect(0, 0, screen.width, screen.height); 
             outCtx.drawImage(framebuffer, 0, 0);
         }
 

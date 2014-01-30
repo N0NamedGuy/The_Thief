@@ -47,7 +47,7 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
         this.remaining = diff;
     };
 
-    Countdown.prototype.render = function (ctx) {
+    Countdown.prototype.draw = function (ctx) {
         if (!this.startTime) return;
 
         ctx.save();
