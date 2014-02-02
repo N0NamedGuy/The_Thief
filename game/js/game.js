@@ -53,7 +53,38 @@ function (Assets,
             style.height = (gameCanvas.height * scale) + "px";
         }
 
+        function onDragOver(e) {
+            e.preventDefault();
+        }
+
+        function onDrop(e) {
+            e.preventDefault();
+
+            var file = e.dataTransfer.files[0];
+            var reader = new FileReader();
+
+            reader.addEventListener('load', function (e_) {
+                quit = true;
+
+                var mapJSON = JSON.parse(e_.target.result);
+                var map = new Map();
+                
+                map.load(mapJSON, function (map) {
+                    levelName = "imported_level";
+                    newGame(map);
+                });
+            }, false);
+            console.log(file);
+            reader.readAsText(file);
+
+            return false;
+        }
+
+
         window.addEventListener("resize", onResize, true);
+        
+        document.addEventListener('dragover', onDragOver, false);
+        document.addEventListener('drop', onDrop, false);
         onResize();
     }
 
@@ -211,6 +242,8 @@ function (Assets,
                 } else {
                     window.setTimeout(mainloop, 1000 / 60);
                 }
+            } else {
+                console.log("QUIT!");
             }
         }
 
