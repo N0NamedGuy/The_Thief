@@ -1,6 +1,11 @@
 define(["lib/util", "lib/underscore"], function (Util) {
     "use strict";
         
+    /*
+     * FIXME: move all viewing and drawing housekeeping to it's own object
+     * for instance Screen
+     */
+    
     var onResize = function () {
         var w = this.width;
         var h = this.height;
