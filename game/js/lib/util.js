@@ -49,7 +49,7 @@ define(["lib/underscore"], function util() {
         };
 
         var res = _.map(paths, function(path) {
-            return loader(path, loadedFun);
+            return loader.call(ctx, path, loadedFun);
         });
     };
 

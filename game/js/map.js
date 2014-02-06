@@ -2,7 +2,7 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
     "use strict";
     var Map = function () {};
 
-    function loadTileset(tileset, loadedFun) {
+    var loadTileset = function (tileset, loadedFun) {
         var img = new Image();
 
         img.onload = function () {
@@ -13,22 +13,26 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
         tileset.img = img;
 
         return tileset;
-    }
+    };
+
+    var tilesetsLoaded = function (cb, ctx) {
+        return function (tilesets) {
+            var layers = _.map(this.layers, function (layer) {
+                return new Layer(layer, this);
+            }, this);
+
+            this.layers = layers;
+
+            $_.callback(cb, ctx, [this]);
+        };
+    };
 
     Map.prototype.load = function (mapObject, cb, ctx) {
         _.extend(this, mapObject);
-        var map = this;
 
         /* Load tilesets */
-        Util.loadAsynch(this.tilesets, loadTileset, function (tilesets) {
-            var layers = _.map(map.layers, function (layer) {
-                return new Layer(layer, map);
-            });
-
-            map.layers = layers;
-
-            $_.callback(cb, ctx, [map]);
-        }, this);
+        Util.loadAsynch(this.tilesets, loadTileset,
+               tilesetsLoaded(cb, ctx), this);
     };
 
     Map.prototype.loadJSON = function (filename, cb, ctx) {
