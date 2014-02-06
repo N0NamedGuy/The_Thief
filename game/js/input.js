@@ -50,8 +50,8 @@ define(["lib/util"], function ($_) {
         };
 
         this.pointer = {
-            x: (offset.left / scale) - cam.offx,
-            y: (offset.top / scale) - cam.offy
+            x: (offset.left / scale) - cam.x,
+            y: (offset.top / scale) - cam.y
         };
     };
 
