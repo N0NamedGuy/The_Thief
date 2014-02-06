@@ -27,7 +27,6 @@ function (Assets,
 
     var framebuffer = document.createElement("canvas");
     var gameCanvas = document.createElement("canvas");
-    var bgrender = document.createElement("canvas");
     var quit;
     var input;
     var levelName;
@@ -219,8 +218,6 @@ function (Assets,
         }
         
         function renderGame() {
-            fbCtx.clearRect(0, 0, framebuffer.width, framebuffer.height); 
-
             map.draw(camera, fbCtx);
             countdown.draw(fbCtx);
             
@@ -242,8 +239,6 @@ function (Assets,
                 } else {
                     window.setTimeout(mainloop, 1000 / 60);
                 }
-            } else {
-                console.log("QUIT!");
             }
         }
 

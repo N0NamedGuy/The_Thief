@@ -15,7 +15,7 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
         return tileset;
     }
 
-    Map.prototype.load = function (mapObject, cb) {
+    Map.prototype.load = function (mapObject, cb, ctx) {
         _.extend(this, mapObject);
         var map = this;
 
@@ -27,13 +27,13 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
 
             map.layers = layers;
 
-            $_.callback(cb, this, [map]);
-        });
+            $_.callback(cb, ctx, [map]);
+        }, this);
     };
 
-    Map.prototype.loadJSON = function (filename, cb) {
-        Util.getJSON(filename, function (mapJSON, map) {
-            map.load(mapJSON, cb);
+    Map.prototype.loadJSON = function (filename, cb, ctx) {
+        Util.getJSON(filename, function (mapJSON) {
+            this.load(mapJSON, cb, ctx);
         }, this);
     };
 

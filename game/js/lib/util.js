@@ -11,20 +11,14 @@ define(["lib/underscore"], function util() {
         }
     };
 
-    // FIXME: write callbacks properly (with call(this, *args) or apply(this, args[]))
-    $_.getAJAX = function(req, callback) {
+    $_.getAJAX = function(req, callback, ctx) {
         var xhr = new XMLHttpRequest();
         //xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onreadystatechange = function () {
             if (this.readyState === 4) {
                 if (this.status === 200) {
                     var ret = xhr.responseText;
-
-                    if (typeof callback === "function") {
-                        callback(ret);
-                    } else {
-                        callback(undefined);
-                    }
+                    $_.callback(callback, ctx, [ret]);
                 }
             }
         };
@@ -35,13 +29,7 @@ define(["lib/underscore"], function util() {
 
     $_.getJSON = function(req, callback, ctx) {
         this.getAJAX(req, function (data) {
-            if (typeof callback === "function") {
-                if (req !== undefined) {
-                    callback(JSON.parse(data), ctx);
-                } else {
-                    callback(data, ctx);
-                }
-            }
+            $_.callback(callback, ctx, [JSON.parse(data)]);
         });
     };
 
@@ -50,13 +38,13 @@ define(["lib/underscore"], function util() {
      * @param {function} loader - A loader function to load a path
      * @param {function} callback - When everything is loaded, this callback is called */
 
-    $_.loadAsynch = function (paths, loader, callback) {
+    $_.loadAsynch = function (paths, loader, callback, ctx) {
         var remaining = paths.length;
 
         var loadedFun = function () {
             remaining--;
-            if (remaining === 0 && typeof callback === "function") {
-                callback(res);
+            if (remaining === 0) {
+                $_.callback(callback, ctx, [res]);
             }
         };
 
