@@ -1,6 +1,8 @@
 define(["lib/util"], function ($_) {
     "use strict";
 
+    // TODO: hide private functions
+
     var actions = {
         "up": false,
         "down": false,
@@ -26,14 +28,15 @@ define(["lib/util"], function ($_) {
         81: "left"
     };
 
-    var Input = function (canvas, camera, player) {
-        this.canvas = canvas;
+    var Input = function (camera) {
         this.camera = camera;
+        this.canvas = camera.getCanvas();
         this.pointerDown = false;
-        this.player = player;
 
         this.pointer = undefined;
         this.actions = Object.create(actions);
+
+        this.bindEvents();
     };
 
     Input.prototype.updatePointer = function(ev) {
@@ -87,7 +90,7 @@ define(["lib/util"], function ($_) {
         }
     };
 
-    Input.prototype.unbindEvents = function (e) {
+    Input.prototype.unbindEvents = function () {
         var canvas = this.canvas;
 
         canvas.removeEventListener("mousedown",
@@ -110,7 +113,7 @@ define(["lib/util"], function ($_) {
                 $_.decorateEvent(this, this.onKey), true);
     };
 
-    Input.prototype.bindEvents = function (e) {
+    Input.prototype.bindEvents = function () {
         var canvas = this.canvas;
 
         canvas.addEventListener("mousedown",
@@ -133,11 +136,15 @@ define(["lib/util"], function ($_) {
                 $_.decorateEvent(this, this.onKey), true);
     };
 
-    Input.prototype.process = function (dt) {
+    Input.prototype.process = function (dt, camera) {
+        var player = camera ? camera.target : undefined;
+
+        if (!player) return;
+
         var pointer = this.pointer;
 
         if (this.pointer) {
-            this.player.setTarget(pointer.x, pointer.y);
+            player.setTarget(pointer.x, pointer.y);
             if (!this.pointerDown) this.pointer = undefined;
         } else {
             this.player.moveRelative(

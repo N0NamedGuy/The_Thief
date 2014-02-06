@@ -36,7 +36,10 @@ define(["lib/underscore"], function util() {
     /** Loads an arbitrary amount of resources asynchronously. 
      * @param {Array} paths - Path array to the resources
      * @param {function} loader - A loader function to load a path
-     * @param {function} callback - When everything is loaded, this callback is called */
+     * @param {function} callback - When everything is loaded, this callback is called
+     * @param {Object} ctx - Context class bound to loader and callback functions
+     *                       (in other words, the "this" variable)
+     */
 
     $_.loadAsynch = function (paths, loader, callback, ctx) {
         var remaining = paths.length;
@@ -62,10 +65,10 @@ define(["lib/underscore"], function util() {
      *
      * @return an array containing all functions return values (if any)
      */
-    $_.runParallel = function (funs, cb) {
+    $_.runParallel = function (funs, cb, ctx) {
         return $_.loadAsynch(funs, function (fun, loadedFun) {
             return fun(loadedFun);
-        }, cb);
+        }, cb, ctx);
     };
 
     // From: http://stackoverflow.com/a/901144

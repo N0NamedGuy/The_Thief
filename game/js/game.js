@@ -25,68 +25,16 @@ function (Assets,
         __) {
     "use strict";
 
-    var framebuffer = document.createElement("canvas");
-    var gameCanvas = document.createElement("canvas");
     var quit;
     var input;
     var levelName;
 
-    var camera;
+    var width = 640;
+    var height = 480;
     var scale = 2;
+    var camera = new Camera($_("container"), width, height, scale,
+            16, 5, 6);
         
-    function bindEvents() {
-
-        function onResize(e) {
-            var w = 640, h = 480;
-            var style = gameCanvas.style;
-
-            framebuffer.width = gameCanvas.width = Math.min(w / scale,
-                window.innerWidth / scale);
-            framebuffer.height = gameCanvas.height = Math.min(h / scale,
-                window.innerHeight / scale);
-
-            style.left = ((window.innerWidth - 
-                    (gameCanvas.width * scale)) / 2) + "px";
-
-            style.width = (gameCanvas.width * scale) + "px";
-            style.height = (gameCanvas.height * scale) + "px";
-        }
-
-        function onDragOver(e) {
-            e.preventDefault();
-        }
-
-        function onDrop(e) {
-            e.preventDefault();
-
-            var file = e.dataTransfer.files[0];
-            var reader = new FileReader();
-
-            reader.addEventListener('load', function (e_) {
-                quit = true;
-
-                var mapJSON = JSON.parse(e_.target.result);
-                var map = new Map();
-                
-                map.load(mapJSON, function (map) {
-                    levelName = "imported_level";
-                    newGame(map);
-                });
-            }, false);
-            console.log(file);
-            reader.readAsText(file);
-
-            return false;
-        }
-
-
-        window.addEventListener("resize", onResize, true);
-        
-        document.addEventListener('dragover', onDragOver, false);
-        document.addEventListener('drop', onDrop, false);
-        onResize();
-    }
-
     function loadLevel(filename, callback) {
         quit = true;
 
@@ -100,9 +48,6 @@ function (Assets,
 
     function newGame(map) {
         // Preload some stuff, so we don't need to ask everytime where stuff is
-        var outCtx = gameCanvas.getContext('2d');
-        var fbCtx = framebuffer.getContext('2d');
-
         var bgLayer = map.findLayer("background");
         var aiLayer = map.findLayer("ai");
         var entLayer = map.findLayer("entities");
@@ -178,7 +123,7 @@ function (Assets,
                     Audio.play("step");
                 });
 
-                camera = new Camera(gameCanvas, player, 16, 5, 6);
+                camera.setTarget(player);
 
                 $_.callback(callback);
             });
@@ -218,10 +163,9 @@ function (Assets,
         }
         
         function renderGame() {
-            map.draw(camera, fbCtx);
-            countdown.draw(fbCtx);
-            
-            outCtx.drawImage(framebuffer, 0, 0);
+            map.draw(camera);
+            countdown.draw(camera.getCtx());
+            camera.flip();
         }
 
         function mainloop() {
@@ -245,8 +189,6 @@ function (Assets,
         function init() {
             quit = false;
             lastUpdate = $_.getTicks();
-            outCtx.imageSmoothingEnable = false;
-            fbCtx.imageSmoothingEnable = false;
 
             countdown.addEventListener("tick", function () {
                 Audio.play("blip");
@@ -263,7 +205,7 @@ function (Assets,
                 if (input) {
                     input.unbindEvents();
                 }
-                input = new Input(gameCanvas, camera, player);
+                input = new Input(camera);
                 input.bindEvents();
                 mainloop();
             });
@@ -272,11 +214,9 @@ function (Assets,
         init();
     }
 
-    bindEvents();
     levelName = $_.getParameterByName("map");
 
     levelName = (levelName === "") ? "intro.json" : levelName;
-    $_("container").appendChild(gameCanvas);
     
     Assets.load(function () {
         Audio.load(Assets);

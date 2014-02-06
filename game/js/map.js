@@ -69,9 +69,10 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
         return _.findWhere(this.layers, {name: name});
     };
 
-    Map.prototype.draw = function (camera, ctx) {
-        ctx.save();
+    Map.prototype.draw = function (camera) {
+        var ctx = camera.getCtx(); 
 
+        ctx.save();
         camera.transform(ctx);
 
         _.each(this.layers, function (layer) {

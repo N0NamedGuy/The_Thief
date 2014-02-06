@@ -38,7 +38,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
     var Assets = {};
 
-    Assets.loadImages = function (pathsObj, cb) {
+    var loadImages = function (pathsObj, cb, ctx) {
         var pairs = _.pairs(pathsObj);
 
         return Util.loadAsynch(pairs, function (pair, loadedfun) {
@@ -48,10 +48,10 @@ define(["lib/util", "lib/underscore"], function (Util) {
             img.src = pair[1];
 
             return ret;
-        }, cb);
+        }, cb, ctx);
     };
 
-    Assets.loadAudio = function (pathsObj, cb) {
+    var loadAudio = function (pathsObj, cb, ctx) {
         var pairs = _.pairs(pathsObj);
 
         var ret = _.map(pairs, function (pair) {
@@ -71,27 +71,27 @@ define(["lib/util", "lib/underscore"], function (Util) {
             return [pair[0], audio];
         });
 
-        if (typeof cb === "function") cb(ret);
+        $_.callback(cb, ctx, [ret]);
     };
 
-    Assets.load = function (cb) {
+    Assets.load = function (cb, ctx) {
         function imageLoader(doneFunc) {
-            Assets.loadImages(imageAssets, function (loaded) {
+            loadImages.call(Assets, imageAssets, function (loaded) {
                 Assets.images = Util.makeMap(loaded);
                 doneFunc();
                 return true;
-            });
+            }, ctx);
         }
 
         function audioLoader(doneFunc) {
-            Assets.loadAudio(audioAssets, function (loaded) {
+            loadAudio.call(Assets, audioAssets, function (loaded) {
                 Assets.audio = Util.makeMap(loaded);
                 doneFunc();
                 return true;
             });
         }
 
-        Util.runParallel([imageLoader, audioLoader], cb);
+        Util.runParallel([imageLoader, audioLoader], cb, ctx);
     };
 
     return Assets;
