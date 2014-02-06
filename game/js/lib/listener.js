@@ -1,4 +1,5 @@
 define(["lib/util", "lib/underscore"], function (Util) {
+    // FIXME: context passing needs to be done!
     return function (cls) {
         cls.prototype.__listeners = {};
 
@@ -18,5 +19,11 @@ define(["lib/util", "lib/underscore"], function (Util) {
                 e(event, args);
             });
         };
+
+        cls.prototype.removeEventListener = function (event, fun) {
+            this.__listeners[event] = _.some(this.__listeners[event], function (e) {
+                return fun === e;
+            });
+        };;
     };
 });

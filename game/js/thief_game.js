@@ -9,6 +9,7 @@ define(["assets",
         "audio",
         "camera",
         "lib/util",
+        "lib/listener",
         "lib/underscore"],
 
 function (Assets,
@@ -22,6 +23,7 @@ function (Assets,
         Audio,
         Camera,
         $_,
+        listener,
         __) {
     "use strict";
 
@@ -46,7 +48,9 @@ function (Assets,
             Audio.load(Assets);
             $_.callback(callback, this);
         }, this);
-    }
+    };
+
+    listener(ThiefGame);
 
     /********************************************
      * Game "constants" and adjustables are here
@@ -212,10 +216,12 @@ function (Assets,
 
         var ctx = this;
 
-        if (!this.quit) {
+        if (!this.isQuit) {
             window.requestAnimationFrame(function () {
                 mainloop.call(ctx);
             });
+        } else {
+            this.dispatchEvent("quit");
         }
 
     };
@@ -244,7 +250,7 @@ function (Assets,
 
         this.countdown = countdown;
 
-        this.quit = false;
+        this.isQuit = false;
         this.lastUpdate = $_.getTicks();
         
         loadEntities.call(this, entLayer, mainloop);
@@ -262,11 +268,11 @@ function (Assets,
         var map = new Map();
         this.map = map;
 
-        this.quit = true;
+        this.quit();
 
         var onMapLoad = function (loadedMap) {
             this.levelName = (typeof level === "string") ?
-                level : CUSTOM_LEVEL_NAME;
+                level : this.CUSTOM_LEVEL_NAME;
 
             newGame.call(this, loadedMap);
             $_.callback(callback, this);
@@ -278,7 +284,11 @@ function (Assets,
             map.load(level, onMapLoad, this);
         }
 
-    }
+    };
+
+    ThiefGame.prototype.quit = function () {
+        this.isQuit = true;
+    };
 
     return ThiefGame;
 });
