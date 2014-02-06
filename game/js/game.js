@@ -26,7 +26,6 @@ function (Assets,
     "use strict";
 
     var quit;
-    var input;
     var levelName;
 
     var width = 640;
@@ -34,6 +33,8 @@ function (Assets,
     var scale = 2;
     var camera = new Camera($_("container"), width, height, scale,
             16, 5, 6);
+    
+    var input = new Input(camera);
         
     function loadLevel(filename, callback) {
         quit = true;
@@ -124,6 +125,7 @@ function (Assets,
                 });
 
                 camera.setTarget(player);
+                input.setPlayer(player);
 
                 $_.callback(callback);
             });
@@ -202,11 +204,6 @@ function (Assets,
             });
 
             loadEntities(entLayer, function () {
-                if (input) {
-                    input.unbindEvents();
-                }
-                input = new Input(camera);
-                input.bindEvents();
                 mainloop();
             });
         }

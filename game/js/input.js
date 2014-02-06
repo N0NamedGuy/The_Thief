@@ -42,6 +42,7 @@ define(["lib/util"], function ($_) {
     Input.prototype.updatePointer = function(ev) {
         var off = this.canvas.getBoundingClientRect();
         var cam = this.camera;
+        var scale = cam.scale;
 
         var offset = {
             left: ev.pageX - off.left,
@@ -49,8 +50,8 @@ define(["lib/util"], function ($_) {
         };
 
         this.pointer = {
-            x: (offset.left / cam.scale) - cam.offx,
-            y: (offset.top / cam.scale) - cam.offy
+            x: (offset.left / scale) - cam.offx,
+            y: (offset.top / scale) - cam.offy
         };
     };
 
@@ -136,8 +137,8 @@ define(["lib/util"], function ($_) {
                 $_.decorateEvent(this, this.onKey), true);
     };
 
-    Input.prototype.process = function (dt, camera) {
-        var player = camera ? camera.target : undefined;
+    Input.prototype.process = function (dt) {
+        var player = this.player;
 
         if (!player) return;
 
@@ -153,6 +154,10 @@ define(["lib/util"], function ($_) {
             );
         }
     };
+
+    Input.prototype.setPlayer = function (player) {
+        this.player = player;
+    }
 
     return Input;
 });
