@@ -30,7 +30,10 @@ define(["lib/util"], function ($_) {
 
     var Input = function (camera) {
         this.camera = camera;
-        this.canvas = camera.getCanvas();
+        this.screen = camera.getScreen();
+        this.scale = this.screen.scale;
+
+        this.canvas = this.screen.getCanvas();
         this.pointerDown = false;
 
         this.pointer = undefined;

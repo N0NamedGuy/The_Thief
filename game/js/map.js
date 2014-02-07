@@ -70,7 +70,8 @@ define(["layer", "lib/util", "lib/underscore"], function (Layer, Util) {
     };
 
     Map.prototype.draw = function (camera) {
-        var ctx = camera.getCtx(); 
+        var screen = camera.getScreen();
+        var ctx = screen.getCtx(); 
 
         ctx.save();
         camera.transform(ctx);

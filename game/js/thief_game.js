@@ -8,6 +8,7 @@ define(["assets",
         "input",
         "audio",
         "camera",
+        "screen",
         "lib/util",
         "lib/listener",
         "lib/underscore"],
@@ -22,6 +23,7 @@ function (Assets,
         Input,
         Audio,
         Camera,
+        Screen,
         $_,
         listener,
         __) {
@@ -32,21 +34,23 @@ function (Assets,
      *
      * @param container The target container where the game will be rendered
      */
-    var ThiefGame = function (container, callback) {
-        var camera = new Camera(container, this.SCREEN_W, this.SCREEN_H,
-                this.SCREEN_SCALE,
-                /* FIXME: make these values constants */
-                16, 5, 6);
+    var ThiefGame = function (container, callback, ctx) {
+        var screen = new Screen(container, this.SCREEN_W, this.SCREEN_H,
+                this.SCREEN_SCALE);
 
+        /* FIXME: turn these values into constants */
+        var camera = new Camera(screen, 16, 5, 6);
         var input = new Input(camera);
         
-        this.input = input;
+        this.screen = screen;
         this.camera = camera;
+        this.input = input;
+        
         this.levelName = undefined;
 
         Assets.load(function() {
             Audio.load(Assets);
-            $_.callback(callback, this);
+            $_.callback(callback, ctx);
         }, this);
     };
 
@@ -196,11 +200,12 @@ function (Assets,
 
     var renderGame = function () {
         var camera = this.camera;
+        var screen = this.screen;
 
         this.map.draw(camera);
-        this.countdown.draw(camera.getCtx());
+        this.countdown.draw(screen.getCtx());
 
-        camera.flip();
+        screen.flip();
     };
 
     var mainloop = function () {

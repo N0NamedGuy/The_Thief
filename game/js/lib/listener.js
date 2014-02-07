@@ -14,9 +14,9 @@ define(["lib/util", "lib/underscore"], function (Util) {
             this.__listeners[event] = lst;
         };
 
-        cls.prototype.dispatchEvent = function (event, args) {
+        cls.prototype.dispatchEvent = function (event, args, ctx) {
             _.each(this.__listeners[event], function (e) {
-                e(event, args);
+                e.call(ctx, event, args);
             });
         };
 
