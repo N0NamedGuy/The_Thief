@@ -1,5 +1,4 @@
 define(["lib/util", "lib/underscore"], function (Util) {
-    // FIXME: context passing needs to be done!
     return function (cls) {
         cls.prototype.__listeners = {};
 

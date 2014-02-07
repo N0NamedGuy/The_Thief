@@ -1,11 +1,6 @@
 define(["lib/util", "lib/underscore"], function (Util) {
     "use strict";
         
-    /*
-     * FIXME: move all viewing and drawing housekeeping to it's own object
-     * for instance Screen
-     */
-    
     var Camera = function (screen, shake, laziness, friction) {
         this.screen = screen;
         this.canvas = screen.getCanvas();

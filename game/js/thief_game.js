@@ -38,8 +38,8 @@ function (Assets,
         var screen = new Screen(container, this.SCREEN_W, this.SCREEN_H,
                 this.SCREEN_SCALE);
 
-        /* FIXME: turn these values into constants */
-        var camera = new Camera(screen, 16, 5, 6);
+        var camera = new Camera(screen,
+                this.CAM_SHAKE, this.CAM_LAZINESS, this.CAM_FRICTION);
         var input = new Input(camera);
         
         this.screen = screen;
@@ -71,6 +71,10 @@ function (Assets,
     ThiefGame.prototype.SCREEN_W = 640;
     ThiefGame.prototype.SCREEN_H = 480;
     ThiefGame.prototype.SCREEN_SCALE = 2;
+
+    ThiefGame.prototype.CAM_SHAKE = 16;
+    ThiefGame.prototype.CAM_LAZINESS = 5;
+    ThiefGame.prototype.CAM_FRICTION = 6;
 
     ThiefGame.prototype.CUSTOM_LEVEL_NAME = "custom_level";
     
