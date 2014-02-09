@@ -2,9 +2,11 @@ require(["thief_game"], function (ThiefGame) {
     "use strict";
 
     var game = new ThiefGame($_("container"), function () {
-        game.playLevel("intro.json", function () {
-            console.log("Game loaded");
+        game.addEventListener("levelchanged", function (event, level) {
+            console.log("Game loaded", level);
         });
+
+        game.playLevel("intro.json");
     });
 
     var onDragOver = function (e) {

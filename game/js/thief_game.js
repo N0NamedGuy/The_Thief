@@ -68,8 +68,8 @@ function (Assets,
     
     ThiefGame.prototype.ESCAPE_TIME = 9;
     
-    ThiefGame.prototype.SCREEN_W = 640;
-    ThiefGame.prototype.SCREEN_H = 480;
+    ThiefGame.prototype.SCREEN_W = 800;
+    ThiefGame.prototype.SCREEN_H = 600;
     ThiefGame.prototype.SCREEN_SCALE = 2;
 
     ThiefGame.prototype.CAM_SHAKE = 16;
@@ -81,6 +81,10 @@ function (Assets,
     /********************************************
      * Private functions are here
      ********************************************/
+
+    var sanitizeMap = function (map) {
+        // TODO: implement me
+    }
 
     var loadEntities = function (layer, callback) {
         $_.getJSON(this.ENTITIES_FILE, function (entities) {
@@ -109,6 +113,16 @@ function (Assets,
             var guards = findObjects("guard");
 
             var map = this.map;
+
+            if (!player) {
+                console.err("Player object not found in map!");
+                return;
+            }
+            
+            if (!goal) {
+                console.err("Goal object not found in map!");
+                return;
+            }
 
             player = new Player(player, map, entities);
             goal = new Goal(goal, map, entities);
@@ -196,8 +210,15 @@ function (Assets,
         var props = bgLayer.getProperties(player.x, player.y);
         if (props && props.isexit && props.isexit === "true") {
             if (player.goals > 0) {
-                // TODO: add event trigger level change
-                this.playLevel(this.map.properties.nextmap);
+
+                var props = this.map.properties;
+                var nextMap = props ? props.nextmap : undefined;
+
+                if (nextMap) {
+                    this.playLevel(nextmap);
+                } else {
+                    console.err("No next map property has been found...!");
+                }
             }
         }
     };
@@ -240,6 +261,21 @@ function (Assets,
         var aiLayer = map.findLayer(this.LAYER_AI);
         var entLayer = map.findLayer(this.LAYER_ENTITIES);
 
+        if (!bgLayer) {
+            console.err("No '" + this.LAYER_BACKGROUND + "' layer on map!");
+            return;
+        }
+
+        if (!aiLayer) {
+            console.err("No '" + this.LAYER_AI + "' layer on map!");
+            return;
+        }
+        
+        if (!entLayer) {
+            console.err("No '" + this.LAYER_ENTITIES + "' layer on map!");
+            return;
+        }
+
         var countdown = new Countdown(this.ESCAPE_TIME);
         countdown.addEventListener("tick", function () {
             Audio.play("blip");
@@ -273,7 +309,7 @@ function (Assets,
     /**
      * Plays a certain level
      */
-    ThiefGame.prototype.playLevel = function (level, callback) {
+    ThiefGame.prototype.playLevel = function (level) {
         var map = new Map();
         this.map = map;
 
@@ -284,7 +320,7 @@ function (Assets,
                 level : this.CUSTOM_LEVEL_NAME;
 
             newGame.call(this, loadedMap);
-            $_.callback(callback, this);
+            this.dispatchEvent("levelchanged", level);
         }
         
         if (typeof level === "string") {
