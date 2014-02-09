@@ -195,7 +195,7 @@ define(["lib/underscore"], function util() {
      *
      * @param {number} index The point/square index.
      * @param {number} width The grid width.
-     * @returns {Coordinate} An object
+     * @returns {Coordinate} The point/square coordinates.
      */
     $_.toXY = function (index, width) {
         return {
