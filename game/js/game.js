@@ -1,7 +1,7 @@
 /**
  * @author David Serrano <david.ma.serrano@gmail.com>
  */
-require(["thief_game"], function (ThiefGame) {
+require(["thief_game", "lib/util"], function (ThiefGame) {
     "use strict";
 
     var game = new ThiefGame($_("container"), function () {
@@ -12,14 +12,7 @@ require(["thief_game"], function (ThiefGame) {
         game.playLevel("intro.json");
     });
 
-    var onDragOver = function (e) {
-        e.preventDefault();
-    };
-
-    var onDrop = function (e) {
-        e.preventDefault();
-
-        var file = e.dataTransfer.files[0];
+    var loadMap = function (file) {
         var reader = new FileReader();
 
         reader.addEventListener('load', function (e_) {
@@ -34,10 +27,29 @@ require(["thief_game"], function (ThiefGame) {
 
         }, false);
         reader.readAsText(file);
+    }
+
+    var onDragOver = function (e) {
+        e.preventDefault();
+    };
+
+
+    var onDrop = function (e) {
+        e.preventDefault();
+
+        var file = e.dataTransfer.files[0];
+        loadMap(file);
 
         return false;
     };
 
+    var onFileChange = function (e) {
+        var file = e.target.files[0];
+        loadMap(file);
+    }
+
     document.addEventListener('dragover', onDragOver, false);
     document.addEventListener('drop', onDrop, false);
+
+    $_("maploader").addEventListener('change', onFileChange, false);
 });

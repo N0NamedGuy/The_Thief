@@ -237,12 +237,12 @@ function (Assets,
             var map = this.map;
 
             if (!player) {
-                console.err("Player object not found in map!");
+                console.error("Player object not found in map!");
                 return;
             }
             
             if (!goal) {
-                console.err("Goal object not found in map!");
+                console.error("Goal object not found in map!");
                 return;
             }
 
@@ -346,9 +346,9 @@ function (Assets,
                 var nextMap = props ? props.nextmap : undefined;
 
                 if (nextMap) {
-                    this.playLevel(nextmap);
+                    this.playLevel(nextMap);
                 } else {
-                    console.err("No next map property has been found...!");
+                    console.error("No next map property has been found...!");
                 }
             }
         }
@@ -406,17 +406,17 @@ function (Assets,
         var entLayer = map.findLayer(this.LAYER_ENTITIES);
 
         if (!bgLayer) {
-            console.err("No '" + this.LAYER_BACKGROUND + "' layer on map!");
+            console.error("No '" + this.LAYER_BACKGROUND + "' layer on map!");
             return;
         }
 
         if (!aiLayer) {
-            console.err("No '" + this.LAYER_AI + "' layer on map!");
+            console.error("No '" + this.LAYER_AI + "' layer on map!");
             return;
         }
         
         if (!entLayer) {
-            console.err("No '" + this.LAYER_ENTITIES + "' layer on map!");
+            console.error("No '" + this.LAYER_ENTITIES + "' layer on map!");
             return;
         }
 

@@ -32,6 +32,8 @@
         div#debug {
             background-color: lightgray;
             z-index: 999999;
+            position: fixed;
+            bottom: 0;
         }
         
         html, body {
@@ -46,8 +48,10 @@
 </head>
 
 <body>
-    <div id="debug"></div>
     <div id="container">
+    </div>
+    <div id="debug">
+        Load Map: <input type="file" id="maploader">
     </div>
     <script type="text/javascript" data-main="js/game.js" src="js/lib/require.js"></script>
 </body>
