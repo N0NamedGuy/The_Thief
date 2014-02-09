@@ -13,6 +13,7 @@ define(["assets",
         "lib/listener",
         "lib/underscore"],
 
+
 function (Assets,
         Map,
         Countdown,
@@ -29,10 +30,37 @@ function (Assets,
         __) {
     "use strict";
 
-    /*
-     * ThiefGame constructor
+    /**
+     * A callback without any kind of arguments.
+     * @callback ThiefGame~NoArgCallback
+     */
+
+    /**
+     * Where the game is at. All game logic is implemented here.
      *
-     * @param container The target container where the game will be rendered
+     * @author David Serrano <david.ma.serrano@gmail.com>
+     * @exports ThiefGame
+     *
+     * @requires Map
+     * @requires Countdown
+     * @requires Entity
+     * @requires Player
+     * @requires Guard
+     * @requires Goal
+     * @requires Input
+     * @requires Audio
+     * @requires Camera
+     * @requires Screen
+     * @requires $_
+     * @requires Listener
+     * @requires _
+     *
+     * @constructor
+     * @param {HTMLElement} container The HTML element that will act as container
+     *      for the game. Usually a <code>&lt;div&gt;</code> element.
+     * @param {ThiefGame~NoArgCallback} callback The callback function that is
+     *      when the game assets are loaded.
+     * @param {Object} ctx The object to which the callback function will be bound.
      */
     var ThiefGame = function (container, callback, ctx) {
         var screen = new Screen(container, this.SCREEN_W, this.SCREEN_H,
@@ -59,33 +87,127 @@ function (Assets,
     /********************************************
      * Game "constants" and adjustables are here
      ********************************************/
+    /**
+     * The maps base path.
+     * @constant {String}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.MAP_BASE_DIR = "maps/";
+    /**
+     * The entities file.
+     * @constant {String}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.ENTITIES_FILE = "entities.json";
 
+    /**
+     * The name of the background layer.
+     * @constant {String}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.LAYER_BACKGROUND = "background";
+    /**
+     * The name of the AI layer.
+     * @constant {String}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.LAYER_AI = "ai";
+    /**
+     * The name of the entities layer.
+     * @constant {String}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.LAYER_ENTITIES = "entities";
     
+    /**
+     * The number of seconds the player (thief) has to escape,
+     * after he/she gets the treasure/goal.
+     * @constant {number}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.ESCAPE_TIME = 9;
     
+    /**
+     * The game's screen width.
+     * @constant {number}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.SCREEN_W = 800;
+    /**
+     * The game's screen height.
+     * @constant {number}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.SCREEN_H = 600;
+    /**
+     * The screen's scale.
+     * @constant {number}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.SCREEN_SCALE = 2;
 
+    /**
+     * The camera's shake intensity. Higher numbers
+     * make it shake more intensily when the countdown
+     * is ticking. The value is mesaure in pixels.
+     * @constant {number}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.CAM_SHAKE = 16;
+    /**
+     * Defines how lazy the camera is to start moving.
+     * @constant {number}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.CAM_LAZINESS = 5;
+    /**
+     * The camera's friction factor.
+     * @constant {number}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.CAM_FRICTION = 6;
 
+    /**
+     * The default level name for a custom or imported map.
+     * @constant {String}
+     * @readonly
+     * @default
+     */
     ThiefGame.prototype.CUSTOM_LEVEL_NAME = "custom_level";
     
     /********************************************
      * Private functions are here
      ********************************************/
 
+    /**
+     * @method sanitizeMap
+     * @private
+     * @param {Map} map
+     */
     var sanitizeMap = function (map) {
         // TODO: implement me
     }
 
+    /**
+     * Loads all entities
+     *
+     * @memberof! ThiefGame
+     * @param {Layer} layer
+     * @param callback
+     * @fires entitiesloaded
+     */
     var loadEntities = function (layer, callback) {
         $_.getJSON(this.ENTITIES_FILE, function (entities) {
             function objectFinder(type) {
@@ -169,10 +291,15 @@ function (Assets,
             this.goal = goal;
             this.guards = guards;
 
+            this.dispatchEvent("entitiesloaded");
             $_.callback(callback, this);
         }, this);
     };
-    
+   
+    /**
+     * Restarts the level.
+     * @private
+     */
     var restartLevel = function () {
         this.player.reset();
         this.goal.reset();
@@ -182,6 +309,10 @@ function (Assets,
         this.countdown.reset();
     };
 
+    /**
+     * Processes the game's logic.
+     * @private
+     */
     var processLogic = function (dt) {
         var bgLayer = this.bgLayer;
         var aiLayer = this.aiLayer;
@@ -223,6 +354,10 @@ function (Assets,
         }
     };
 
+    /**
+     * Makes a graphical rendering of the game state.
+     * @private
+     */
     var renderGame = function () {
         var camera = this.camera;
         var screen = this.screen;
@@ -233,6 +368,10 @@ function (Assets,
         screen.flip();
     };
 
+    /**
+     * The game's "main loop" that should be called from time to time.
+     * @private
+     */
     var mainloop = function () {
         var curTime = $_.getTicks();
         var dt = (curTime - this.lastUpdate) / 60;
@@ -256,6 +395,11 @@ function (Assets,
 
     };
 
+    /**
+     * After everything is loaded, this function will start a new game.
+     * @private
+     * @param {Map} the map object to be played
+     */
     var newGame = function (map) {
         var bgLayer = map.findLayer(this.LAYER_BACKGROUND);
         var aiLayer = map.findLayer(this.LAYER_AI);
@@ -307,7 +451,9 @@ function (Assets,
      ********************************************/
 
     /**
-     * Plays a certain level
+     * Plays a certain level.
+     * @param {String|Map} level The level's name or a map object.
+     * @fires levelchanged
      */
     ThiefGame.prototype.playLevel = function (level) {
         var map = new Map();
@@ -331,6 +477,9 @@ function (Assets,
 
     };
 
+    /**
+     * Tells the game to quit.
+     */
     ThiefGame.prototype.quit = function () {
         this.isQuit = true;
     };

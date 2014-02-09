@@ -1,3 +1,6 @@
+/**
+ * @author David Serrano <david.ma.serrano@gmail.com>
+ */
 require(["thief_game"], function (ThiefGame) {
     "use strict";
 
