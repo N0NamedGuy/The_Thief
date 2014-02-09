@@ -1,16 +1,53 @@
 define(["lib/underscore"], function util() {
     "use strict";
 
+    /**
+     * Helper variable for {@link $_.getTime}
+     * @private
+     */
     var startTime = new Date().getTime();
 
+    /**
+     * Utility functions module.
+     *
+     * @author David Serrano <david.ma.serrano@gmail.com>
+     * @exports $_
+     */
     var $_ = function (id) {
+        return $_.select(id);
+    };
+
+    /**
+     * Selects an HTMLElement from the DOM by it's id.
+     * It is essentially a shorthand for <code>document.getEleemntById</code>.
+     * Can be aliased with <code>$_(id)</code>.
+     *
+     * @param id {String} The id of the HTML elemment.
+     * @return {HTMLElement} The selected HTML element.
+     */
+    $_.select = function (id) {
         if (id) {
             return document.getElementById(id);
         } else {
             return undefined;
         }
-    };
+    }
 
+    /**
+     * Callback for when an AJAX request is made sucessfully
+     *
+     * @callback $_~AJAXCallback
+     * @param data {String} The returned data.
+     */
+    
+    /**
+     * Fuction to easily make an AJAX request.
+     *  
+     * @param {String} req request URL.
+     * @param {$_~AJAXCallback} callback Function that is caled when AJAX data
+     *          is received.
+     * @param ctx The object to which the callback function will be bound to.
+     */
     $_.getAJAX = function(req, callback, ctx) {
         var xhr = new XMLHttpRequest();
         //xhr.setRequestHeader('Content-Type', 'application/json');
@@ -27,18 +64,49 @@ define(["lib/underscore"], function util() {
         xhr.send(null);
     };
 
+    /**
+     * Callback for when an JSON AJAX request is made sucessfully
+     *
+     * @callback $_~JSONCallback
+     * @param data {Object} The returned JSON data.
+     */
+
+    /**
+     * Function to easy make an AJAX request, that returns JSON data.
+     *
+     * @param {String} req request URL.
+     * @param {$_~JSONCallback} callback Function that is caled when JSON AJAX
+     *          data is received.
+     */
     $_.getJSON = function(req, callback, ctx) {
         this.getAJAX(req, function (data) {
             $_.callback(callback, ctx, [JSON.parse(data)]);
         });
     };
 
-    /** Loads an arbitrary amount of resources asynchronously. 
-     * @param {Array} paths - Path array to the resources
-     * @param {function} loader - A loader function to load a path
-     * @param {function} callback - When everything is loaded, this callback is called
-     * @param {Object} ctx - Context class bound to loader and callback functions
-     *                       (in other words, the "this" variable)
+    /**
+     * Called when a resource needs loading.
+     *
+     * @callback $_~AsynchLoader
+     * @param {any} path "Path" or other data relevante for the loader to load
+     *      a resource.
+     */
+
+    /**
+     * Called when all resources are loaded.
+     *
+     * @callback $_~AsynchLoaded
+     * @param {Array} resources All resources that have been loaded.
+     */
+
+    /**
+     * Loads an arbitrary amount of resources asynchronously. 
+     *
+     * @param {Array} paths - Path array to the resources.
+     * @param {$_~AsynchLoader} loader - A loader function to load a path.
+     * @param {$_~AsynchLoaded} callback - When everything is loaded, this callback is called.
+     * @param {Object} ctx - Context object bound to loader and callback functions
+     *                       (in other words, the "this" variable).
      */
 
     $_.loadAsynch = function (paths, loader, callback, ctx) {
@@ -59,11 +127,12 @@ define(["lib/underscore"], function util() {
     /**
      * Runs multiple functions "in parallel".
      *
-     * @param {function[]} funs - An arrays of functions with one argument
-     * (which we'll call loadedFun) that should be called when the function's
-     * task is done.
+     * @param {Array.<$_~AsynchLoader>} funs - An array of functions with one argument
+     *      that should be called when the function's task is done.
+     * @param {$_~AsynchLoaded} cb - Called when all functions are done.
+     * @param {Object} ctx - Object bound to the callback function.
      *
-     * @return an array containing all functions return values (if any)
+     * @return {Array.<Any>} an array containing all functions return values (if any).
      */
     $_.runParallel = function (funs, cb, ctx) {
         return $_.loadAsynch(funs, function (fun, loadedFun) {
@@ -72,6 +141,12 @@ define(["lib/underscore"], function util() {
     };
 
     // From: http://stackoverflow.com/a/901144
+    /**
+     * Gets a parameter from the URL's query string.
+     *
+     * @param {String} name The parameter's name.
+     * @return {String} The parameter's value.
+     */
     $_.getParameterByName = function (name) {
         name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
         var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -79,11 +154,27 @@ define(["lib/underscore"], function util() {
         return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     };
 
+    /**
+     * Gets how many ticks (or miliseconds) have passed since this script
+     * started running.
+     *
+     * @return {number} Miliseconds passed since this script started runnig.
+     */
     $_.getTicks = function () {
         var now = new Date().getTime();
         return now - startTime;
     };
 
+    /**
+     * Transforms an array of tuples into an object.
+     * The first value of each tuple represents the key, the second is the value.
+     *
+     * @example
+     * $_.makeMap([["a": 1], ["b": 2]]) === {a: 1, b: 2}
+     *
+     * @param {Array.<Array>} The array of tuples.
+     * @returns {object} The object created from the array of pairs/tuples.
+     */
     $_.makeMap = function (arr) {
         return _.reduceRight(arr, function (obj, pair) {
             obj[pair[0]] = pair[1]; 
@@ -91,6 +182,21 @@ define(["lib/underscore"], function util() {
         }, {});
     };
 
+    /**
+     * An object that repsents a x,y coordinate.
+     *
+     * @typedef {object} Coordinate
+     * @property {number} x X coordinate.
+     * @property {number} y X coordinate.
+     */
+
+    /**
+     * Given an width, converts an index to (X,Y) coordinates from a grid.
+     *
+     * @param {number} index The point/square index.
+     * @param {number} width The grid width.
+     * @returns {Coordinate} An object
+     */
     $_.toXY = function (index, width) {
         return {
             x: index % width,
@@ -98,16 +204,54 @@ define(["lib/underscore"], function util() {
         };
     };
 
-    $_.fromXY = function (x, y, th, tw, width) {
+    /**
+     * Given (x,y) coordinates, calculates the grid index of a square.
+     *
+     * @param {number} x The X coordinate.
+     * @param {number} y The Y coordinate.
+     * @param {number} tw The tile/square width.
+     * @param {number} th The tile/square height.
+     * @param {number} width The grid's width.
+     * @returns {number} The square's index.
+     */
+    $_.fromXY = function (x, y, tw, th, width) {
         return (Math.floor(y / th) * width) + Math.floor(x / tw);
     };
 
+    /**
+     * Binds an event handler function to a context.
+     *
+     * @example
+     * var obj = {
+     *    triggered: false,
+     *    test: function () {
+     *        document.addEventListener("click",
+     *            $_.decorateEvent(this, function () {
+     *                // this.triggered is obj.triggered
+     *                this.triggered = true;
+     *            })
+     *        );
+     *    }
+     * }
+     *
+     * @param {object} ctx The object to bind the function to.
+     * @param {function} fun The handler function.
+     * @return {function(nsIDOMEvent)} A function to be passed to an
+     *      event handler.
+     */
     $_.decorateEvent = function (ctx, fun) {
         return function onEv(ev) {
             fun.call(ctx, ev);
         }
     };
 
+    /**
+     * Function to facilitate bound callbacks.
+     *
+     * @param {function} fun The function to call.
+     * @param {object} ctx The object to which the function will be bound.
+     * @param {Array.<object>} args The arguments that are passed to the function.
+     */
     $_.callback = function (fun, ctx, args) {
         if (fun && fun.call) {
             fun.apply(ctx, args);
