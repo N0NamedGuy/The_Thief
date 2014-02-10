@@ -9,7 +9,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
 
         canvas = document.createElement("canvas");
         canvas.width = this.map.width * this.map.tilewidth;
-        canvas.height = this.map.height * this.map.height;
+        canvas.height = this.map.height * this.map.tileheight;
         canvas.dirty = true;
         
         ctx = canvas.getContext("2d");
