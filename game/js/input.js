@@ -1,8 +1,6 @@
 define(["lib/util"], function ($_) {
     "use strict";
 
-    // TODO: hide private functions
-
     var actions = {
         "up": false,
         "down": false,
@@ -39,10 +37,10 @@ define(["lib/util"], function ($_) {
         this.pointer = undefined;
         this.actions = Object.create(actions);
 
-        this.bindEvents();
+        bindEvents.call(this);
     };
 
-    Input.prototype.updatePointer = function(ev) {
+    var updatePointer = function(ev) {
         var off = this.canvas.getBoundingClientRect();
         var cam = this.camera;
         var scale = cam.scale;
@@ -58,7 +56,7 @@ define(["lib/util"], function ($_) {
         };
     };
 
-    Input.prototype.onMouse = function (e) {
+    var onMouse = function (e) {
         e.preventDefault();
 
         if (e.type === "mousedown") {
@@ -68,11 +66,11 @@ define(["lib/util"], function ($_) {
             return false;
         }
 
-        if (this.pointerDown) this.updatePointer(e);
+        if (this.pointerDown) updatePointer.call(this, e);
         return false;
     };
 
-    Input.prototype.onTouch = function (e) {
+    var onTouch = function (e) {
         e.preventDefault();
 
         var touches = e.changedTouches;
@@ -80,12 +78,12 @@ define(["lib/util"], function ($_) {
             return false;
         }
         var touch = touches[0];
-        this.updatePointer(touch);
+        updatePointer.call(this, touch);
 
         return false;
     };
 
-    Input.prototype.onKey = function (e) {
+    var onKey = function (e) {
         e.preventDefault();
 
         var action = keys[e.keyCode];
@@ -94,7 +92,30 @@ define(["lib/util"], function ($_) {
         }
     };
 
-    Input.prototype.unbindEvents = function () {
+    var bindEvents = function () {
+        var canvas = this.canvas;
+
+        canvas.addEventListener("mousedown",
+                $_.decorateEvent(this, onMouse), true);
+        canvas.addEventListener("mouseup",
+                $_.decorateEvent(this, onMouse), true);
+        canvas.addEventListener("mousemove",
+                $_.decorateEvent(this, onMouse), true);
+
+        canvas.addEventListener("touchmove",
+                $_.decorateEvent(this, onTouch), true);
+        canvas.addEventListener("touchend",
+                $_.decorateEvent(this, onTouch), true);
+        canvas.addEventListener("touchstart",
+                $_.decorateEvent(this, onTouch), true);
+
+        window.addEventListener("keydown",
+                $_.decorateEvent(this, onKey), true);
+        window.addEventListener("keyup",
+                $_.decorateEvent(this, onKey), true);
+    };
+
+    Input.prototype.unbind = function () {
         var canvas = this.canvas;
 
         canvas.removeEventListener("mousedown",
@@ -114,29 +135,6 @@ define(["lib/util"], function ($_) {
         window.removeEventListener("keydown",
                 $_.decorateEvent(this, this.onKey), true);
         window.removeEventListener("keyup",
-                $_.decorateEvent(this, this.onKey), true);
-    };
-
-    Input.prototype.bindEvents = function () {
-        var canvas = this.canvas;
-
-        canvas.addEventListener("mousedown",
-                $_.decorateEvent(this, this.onMouse), true);
-        canvas.addEventListener("mouseup",
-                $_.decorateEvent(this, this.onMouse), true);
-        canvas.addEventListener("mousemove",
-                $_.decorateEvent(this, this.onMouse), true);
-
-        canvas.addEventListener("touchmove",
-                $_.decorateEvent(this, this.onTouch), true);
-        canvas.addEventListener("touchend",
-                $_.decorateEvent(this, this.onTouch), true);
-        canvas.addEventListener("touchstart",
-                $_.decorateEvent(this, this.onTouch), true);
-
-        window.addEventListener("keydown",
-                $_.decorateEvent(this, this.onKey), true);
-        window.addEventListener("keyup",
                 $_.decorateEvent(this, this.onKey), true);
     };
 
