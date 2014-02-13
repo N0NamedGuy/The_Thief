@@ -229,7 +229,6 @@ function (Assets,
                 return _.select(layer.objects, objectFinder(type));
             }
 
-            // TODO: add console alerts if entities are missing to help debugging
             var player = findObject("player");
             var goal = findObject("treasure");
             var guards = findObjects("guard");
