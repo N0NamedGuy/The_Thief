@@ -131,7 +131,7 @@ function (Assets,
      * @readonly
      * @default
      */
-    ThiefGame.prototype.ESCAPE_TIME = 9;
+    ThiefGame.prototype.ESCAPE_TIME = 10;
     
     /**
      * The game's screen width.

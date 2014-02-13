@@ -5,7 +5,7 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
         this.startTime = undefined;
         this.failed = false;
         this.remaining = 0;
-        this.lastsecs = secs;
+        this.timeout = this.lastsecs = secs;
     };
 
     listener(Countdown);
@@ -13,6 +13,7 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
     Countdown.prototype.reset = function () {
         this.startTime = undefined;
         this.failed = false;
+        this.lastsecs = this.timeout;
     };
     
     Countdown.prototype.start = function () {
@@ -24,7 +25,7 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
         if (!this.startTime) return;
 
         var curTime = Util.getTicks();
-        var diff = (10000) - (curTime - this.startTime);
+        var diff = (this.timeout * 1000) - (curTime - this.startTime);
 
         var secs = Math.floor(diff / 1000);
         var cents = Math.floor(diff / 10) % 100;
