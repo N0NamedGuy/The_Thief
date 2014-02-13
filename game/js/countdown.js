@@ -34,7 +34,10 @@ define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener)
 
         if (secs != this.lastsecs) {
             this.lastsecs = secs;
-            this.dispatchEvent("tick");
+            this.dispatchEvent("tick", {
+                time: diff,
+                timeStr: this.str
+            });
         }
 
         if (diff <= 0) {

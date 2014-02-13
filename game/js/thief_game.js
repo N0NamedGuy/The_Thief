@@ -329,14 +329,16 @@ function (Assets,
             guard.update(dt, bgLayer, aiLayer);
         });
 
-        // FIXME: make this happen on an event
         if (player.collide(goal)) {
             goal.open(player);
+            this.dispatchEvent("goal", {
+                goal: goal,
+                player: player
+            });
         }
 
         countdown.update();
 
-        // FIXME: make this happen on an event
         var props = bgLayer.getProperties(player.x, player.y);
         if (props && props.isexit && props.isexit === "true") {
             if (player.goals > 0) {
