@@ -139,14 +139,14 @@ function (Assets,
      * @readonly
      * @default
      */
-    ThiefGame.prototype.SCREEN_W = 800;
+    ThiefGame.prototype.SCREEN_W = 1024;
     /**
      * The game's screen height.
      * @constant {number}
      * @readonly
      * @default
      */
-    ThiefGame.prototype.SCREEN_H = 600;
+    ThiefGame.prototype.SCREEN_H = 768;
     /**
      * The screen's scale.
      * @constant {number}

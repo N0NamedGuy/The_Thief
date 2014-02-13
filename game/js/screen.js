@@ -12,6 +12,7 @@ define(["lib/util", "lib/underscore"], function (Entity, Util) {
         return function (e) {
             var style = gameCanvas.style;
 
+            /*
             framebuffer.width = gameCanvas.width = Math.min(w / scale,
                 window.innerWidth / scale); 
             framebuffer.height = gameCanvas.height = Math.min(h / scale,
@@ -19,6 +20,13 @@ define(["lib/util", "lib/underscore"], function (Entity, Util) {
 
             style.left = ((window.innerWidth - 
                     (gameCanvas.width * scale)) / 2) + "px";
+
+            */
+            style.width = (gameCanvas.width * scale) + "px";
+            style.height = (gameCanvas.height * scale) + "px";
+
+            framebuffer.width = gameCanvas.width = window.innerWidth / scale;
+            framebuffer.height = gameCanvas.height = window.innerHeight / scale;
 
             style.width = (gameCanvas.width * scale) + "px";
             style.height = (gameCanvas.height * scale) + "px";
