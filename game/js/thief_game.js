@@ -66,9 +66,7 @@ function (Assets,
      * @param {Object} ctx The object to which the callback function will be bound.
      */
     var ThiefGame = function (container, callback, ctx) {
-        var screen = new Screen(container, this.SCREEN_W, this.SCREEN_H,
-                this.SCREEN_SCALE);
-
+        var screen = new Screen(container);
         var camera = new Camera(screen,
                 this.CAM_SHAKE, this.CAM_LAZINESS, this.CAM_FRICTION);
         var input = new Input(camera);
