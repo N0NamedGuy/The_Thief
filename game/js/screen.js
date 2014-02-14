@@ -1,6 +1,12 @@
 define(["lib/util", "lib/underscore"], function (Entity, Util) {
     "use strict";
 
+    var SCREEN_SCALE_SMALL = 1;
+    var SCREEN_SCALE_BIG = 2;
+    var SCREEN_SCALE = 2;
+
+    var SCREEN_SMALL = 480;
+
     var onResize = function () {
         var w = this.width;
         var h = this.height;
@@ -9,44 +15,41 @@ define(["lib/util", "lib/underscore"], function (Entity, Util) {
         var gameCanvas = this.gameCanvas;
         var framebuffer = this.framebuffer;
 
+        var screen = this;
+
         return function (e) {
             var style = gameCanvas.style;
+            var iw = window.innerWidth;
+            var ih = window.innerHeight;
 
-            /*
-            framebuffer.width = gameCanvas.width = Math.min(w / scale,
-                window.innerWidth / scale); 
-            framebuffer.height = gameCanvas.height = Math.min(h / scale,
-                window.innerHeight / scale); 
+            var myScale = screen.scale = iw > SCREEN_SMALL && ih > SCREEN_SMALL ?
+                scale : SCREEN_SCALE_SMALL;
 
-            style.left = ((window.innerWidth - 
-                    (gameCanvas.width * scale)) / 2) + "px";
+            style.width = (gameCanvas.width * myScale) + "px";
+            style.height = (gameCanvas.height * myScale) + "px";
 
-            */
-            style.width = (gameCanvas.width * scale) + "px";
-            style.height = (gameCanvas.height * scale) + "px";
+            screen.width = framebuffer.width =
+                gameCanvas.width = iw / myScale;
+            
+            screen.height = framebuffer.height =
+                gameCanvas.height = ih / myScale;
 
-            framebuffer.width = gameCanvas.width = window.innerWidth / scale;
-            framebuffer.height = gameCanvas.height = window.innerHeight / scale;
-
-            style.width = (gameCanvas.width * scale) + "px";
-            style.height = (gameCanvas.height * scale) + "px";
+            style.width = (gameCanvas.width * myScale) + "px";
+            style.height = (gameCanvas.height * myScale) + "px";
         };
     };
 
-    var Screen = function (container, width, height, scale) {
+    var Screen = function (container) {
         this.framebuffer = document.createElement("canvas");
         this.gameCanvas = document.createElement("canvas");
 
         this.fbCtx = this.framebuffer.getContext("2d");
         this.gameCtx = this.gameCanvas.getContext("2d");
 
-        this.fbCtx.imageSmoothingEnable = false;
-        this.gameCtx.imageSmoothingEnable = false;
+        this.fbCtx.imageSmoothingEnabled = false;
+        this.gameCtx.imageSmoothingEnabled = false;
 
-        this.width = width;
-        this.height = height;
-
-        this.scale = scale;
+        this.scale = SCREEN_SCALE_BIG;
         
         container.appendChild(this.gameCanvas);
         window.addEventListener("resize", onResize.call(this), true);

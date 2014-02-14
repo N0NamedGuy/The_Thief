@@ -1,6 +1,7 @@
 define(["assets",
         "map",
         "countdown",
+        "radar",
         "entity",
         "player",
         "guard",
@@ -17,6 +18,7 @@ define(["assets",
 function (Assets,
         Map,
         Countdown,
+        Radar,
         Entity,
         Player,
         Guard,
@@ -43,6 +45,7 @@ function (Assets,
      *
      * @requires Map
      * @requires Countdown
+     * @requires Radar
      * @requires Entity
      * @requires Player
      * @requires Guard
@@ -133,28 +136,6 @@ function (Assets,
      */
     ThiefGame.prototype.ESCAPE_TIME = 10;
     
-    /**
-     * The game's screen width.
-     * @constant {number}
-     * @readonly
-     * @default
-     */
-    ThiefGame.prototype.SCREEN_W = 1024;
-    /**
-     * The game's screen height.
-     * @constant {number}
-     * @readonly
-     * @default
-     */
-    ThiefGame.prototype.SCREEN_H = 768;
-    /**
-     * The screen's scale.
-     * @constant {number}
-     * @readonly
-     * @default
-     */
-    ThiefGame.prototype.SCREEN_SCALE = 2;
-
     /**
      * The camera's shake intensity. Higher numbers
      * make it shake more intensily when the countdown
@@ -286,6 +267,8 @@ function (Assets,
             this.camera.setTarget(player);
             this.input.setPlayer(player);
 
+            this.radar.setEntities(player, guards, goal);
+
             this.player = player;
             this.goal = goal;
             this.guards = guards;
@@ -362,9 +345,19 @@ function (Assets,
     var renderGame = function () {
         var camera = this.camera;
         var screen = this.screen;
+        var radar = this.radar;
+
+        var ctx = screen.getCtx();
+
+        ctx.clearRect(0, 0, screen.width, screen.height); 
 
         this.map.draw(camera);
-        this.countdown.draw(screen.getCtx());
+        this.countdown.draw(ctx);
+
+        ctx.save();
+        ctx.translate(Math.floor(screen.width - radar.width), 0);
+        radar.draw(ctx);
+        ctx.restore();
 
         screen.flip();
     };
@@ -434,11 +427,14 @@ function (Assets,
             }
         });
 
+        var radar = new Radar(bgLayer);
+
         this.bgLayer = bgLayer;
         this.aiLayer = aiLayer;
         this.entitiesLayer = entLayer;
 
         this.countdown = countdown;
+        this.radar = radar;
 
         this.isQuit = false;
         this.lastUpdate = $_.getTicks();

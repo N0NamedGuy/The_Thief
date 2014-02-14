@@ -83,10 +83,15 @@ define(["lib/util", "lib/underscore"], function (Util) {
     Layer.prototype.getProperties = function (x, y) {
         var map = this.map;
         var index = map.fromXY(x, y);
-        var propsCache = this.propsCache;
+        return this.getPropertiesByIndex(index);
+    };
 
+    Layer.prototype.getPropertiesByIndex = function (index) {
+        var propsCache = this.propsCache;
+        
         if (!(index in propsCache)) {
-            var gid = this.data[index];
+            var gid = this.data[index]; 
+            var map = this.map;
 
             if (!gid) return null;
             var tileset = map.findTileset(gid);
@@ -96,9 +101,8 @@ define(["lib/util", "lib/underscore"], function (Util) {
             var props = tileset.tileproperties;
             return propsCache[index] = props[gid];
         }
-
         return propsCache[index];
-    };
+    }
 
     return Layer;
 });

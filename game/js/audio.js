@@ -9,7 +9,7 @@ define(["lib/util", "lib/underscore"], function (Util) {
         if (sample !== undefined) {
             sample.play();
         } else {
-            console.log("Sample " + sample_ + " not found");
+            console.warn("Sample " + sample_ + " not found");
         }
     };
 
