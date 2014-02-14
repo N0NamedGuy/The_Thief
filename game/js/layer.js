@@ -99,9 +99,37 @@ define(["lib/util", "lib/underscore"], function (Util) {
             gid -= tileset.firstgid;
 
             var props = tileset.tileproperties;
-            return propsCache[index] = props[gid];
+            var ret;
+            if (props) {
+                ret = props[gid];
+            } else {
+                ret = null;
+            }
+
+            propsCache[index] = ret;
         }
         return propsCache[index];
+    }
+
+    
+    var objectFinder = function (type) {
+        var layer = this;
+        return function (obj, index) {
+            if (obj.type === type) {
+                obj.index = index;
+                obj.layer = layer;
+                return true;
+            }
+            return false;
+        }
+    }
+
+    Layer.prototype.findObject = function (type) {
+        return _.find(this.objects, objectFinder.call(this, type));
+    }
+    
+    Layer.prototype.findObjects = function (type) {
+        return _.select(this.objects, objectFinder.call(this, type));
     }
 
     return Layer;

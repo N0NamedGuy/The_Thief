@@ -174,5 +174,12 @@ define(["layer", "lib/util", "lib/listener", "lib/underscore"], function (Layer,
         ctx.restore();
     };
 
+    Map.prototype.getProperty = function (key) {
+        if (this.properties && (key in this.properties)) {
+            return this.properties[key];
+        }
+        return undefined;
+    }
+
     return Map; 
 });

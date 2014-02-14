@@ -64,7 +64,7 @@
  "orientation":"orthogonal",
  "properties":
     {
-
+     "showradar":"false"
     },
  "tileheight":32,
  "tilesets":[

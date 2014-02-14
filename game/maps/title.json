@@ -155,7 +155,9 @@
  "orientation":"orthogonal",
  "properties":
     {
-     "nextmap":"the_end.json"
+     "nextmap":"intro.json",
+     "nextmaptimeout":"5",
+     "showradar":"false"
     },
  "tileheight":32,
  "tilesets":[

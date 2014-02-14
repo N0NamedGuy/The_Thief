@@ -68,7 +68,7 @@ function (Assets,
     var ThiefGame = function (container, callback, ctx) {
         var screen = new Screen(container);
         var camera = new Camera(screen,
-                this.CAM_SHAKE, this.CAM_LAZINESS, this.CAM_FRICTION);
+                CAM_SHAKE, CAM_LAZINESS, CAM_FRICTION);
         var input = new Input(camera);
         
         this.screen = screen;
@@ -94,14 +94,14 @@ function (Assets,
      * @readonly
      * @default
      */
-    ThiefGame.prototype.MAP_BASE_DIR = "maps/";
+    var MAP_BASE_DIR = "maps/";
     /**
      * The entities file.
      * @constant {String}
      * @readonly
      * @default
      */
-    ThiefGame.prototype.ENTITIES_FILE = "entities.json";
+    var ENTITIES_FILE = "entities.json";
 
     /**
      * The name of the background layer.
@@ -109,22 +109,26 @@ function (Assets,
      * @readonly
      * @default
      */
-    ThiefGame.prototype.LAYER_BACKGROUND = "background";
+    var LAYER_BACKGROUND = "background";
     /**
      * The name of the AI layer.
      * @constant {String}
      * @readonly
      * @default
      */
-    ThiefGame.prototype.LAYER_AI = "ai";
+    var LAYER_AI = "ai";
     /**
      * The name of the entities layer.
      * @constant {String}
      * @readonly
      * @default
      */
-    ThiefGame.prototype.LAYER_ENTITIES = "entities";
+    var LAYER_ENTITIES = "entities";
     
+    var ENTITY_PLAYER = "player";
+    var ENTITY_GOAL = "treasure";
+    var ENTITY_GUARD = "guard";
+
     /**
      * The number of seconds the player (thief) has to escape,
      * after he/she gets the treasure/goal.
@@ -132,7 +136,7 @@ function (Assets,
      * @readonly
      * @default
      */
-    ThiefGame.prototype.ESCAPE_TIME = 10;
+    var ESCAPE_TIME = 10;
     
     /**
      * The camera's shake intensity. Higher numbers
@@ -142,21 +146,21 @@ function (Assets,
      * @readonly
      * @default
      */
-    ThiefGame.prototype.CAM_SHAKE = 16;
+    var CAM_SHAKE = 16;
     /**
      * Defines how lazy the camera is to start moving.
      * @constant {number}
      * @readonly
      * @default
      */
-    ThiefGame.prototype.CAM_LAZINESS = 5;
+    var CAM_LAZINESS = 5;
     /**
      * The camera's friction factor.
      * @constant {number}
      * @readonly
      * @default
      */
-    ThiefGame.prototype.CAM_FRICTION = 6;
+    var CAM_FRICTION = 6;
 
     /**
      * The default level name for a custom or imported map.
@@ -164,7 +168,7 @@ function (Assets,
      * @readonly
      * @default
      */
-    ThiefGame.prototype.CUSTOM_LEVEL_NAME = "custom_level";
+    var CUSTOM_LEVEL_NAME = "custom_level";
     
     /********************************************
      * Private functions are here
@@ -176,7 +180,45 @@ function (Assets,
      * @param {Map} map
      */
     var sanitizeMap = function (map) {
-        // TODO: implement me
+        // Check if needed layers exist
+        var bgLayer = map.findLayer(LAYER_BACKGROUND);
+        var aiLayer = map.findLayer(LAYER_AI);
+        var entitiesLayer = map.findLayer(LAYER_ENTITIES);
+
+        if (!bgLayer) {
+            console.error("No '" + LAYER_BACKGROUND + "' layer on map!");
+            return;
+        }
+
+        if (!aiLayer) {
+            console.error("No '" + LAYER_AI + "' layer on map!");
+            return;
+        }
+        
+        if (!entitiesLayer) {
+            console.error("No '" + LAYER_ENTITIES + "' layer on map!");
+            return;
+        }
+
+        // Check if needed entities exist
+        var player = entitiesLayer.findObject(ENTITY_PLAYER);
+        if (!player) {
+            console.error("No '" + ENTITY_PLAYER + "' entity on map!");
+            return;
+        }
+
+        var goal = entitiesLayer.findObject(ENTITY_GOAL);
+        if (!player) {
+            console.error("No '" + ENTITY_GOAL + "' entity on map!");
+            return;
+        }
+
+        var guards = entitiesLayer.findObjects(ENTITY_GUARD);
+        if (guards.length === 0) {
+            console.warn("No '" + ENTITY_GUARD + "' entities on map!");
+        }
+
+        return true;
     }
 
     /**
@@ -188,29 +230,10 @@ function (Assets,
      * @fires entitiesloaded
      */
     var loadEntities = function (layer, callback) {
-        $_.getJSON(this.ENTITIES_FILE, function (entities) {
-            function objectFinder(type) {
-                return function (obj, index) {
-                    if (obj.type === type) {
-                        obj.index = index;
-                        obj.layer = layer;
-                        return true;
-                    }
-                    return false;
-                };
-            }
-
-            function findObject(type) {
-                return _.find(layer.objects, objectFinder(type));
-            }
-                
-            function findObjects(type) {
-                return _.select(layer.objects, objectFinder(type));
-            }
-
-            var player = findObject("player");
-            var goal = findObject("treasure");
-            var guards = findObjects("guard");
+        $_.getJSON(ENTITIES_FILE, function (entities) {
+            var player = layer.findObject("player");
+            var goal = layer.findObject("treasure");
+            var guards = layer.findObjects("guard");
 
             var map = this.map;
 
@@ -265,7 +288,10 @@ function (Assets,
             this.camera.setTarget(player);
             this.input.setPlayer(player);
 
-            this.radar.setEntities(player, guards, goal);
+            var radar = this.radar;
+            if (radar) {
+                radar.setEntities(player, guards, goal);
+            }
 
             this.player = player;
             this.goal = goal;
@@ -294,6 +320,8 @@ function (Assets,
      * @private
      */
     var processLogic = function (dt) {
+        var map = this.map;
+
         var bgLayer = this.bgLayer;
         var aiLayer = this.aiLayer;
 
@@ -302,6 +330,8 @@ function (Assets,
         var goal = this.goal;
 
         var countdown = this.countdown;
+
+        var ticks = $_.getTicks();
 
         this.camera.update(countdown.remaining);
 
@@ -320,19 +350,26 @@ function (Assets,
 
         countdown.update();
 
+        function playNext() {
+            var nextMap = map.getProperty("nextmap");
+
+            if (nextMap) {
+                this.playLevel(nextMap);
+            } else {
+                console.error("No next map property has been found...!");
+            }
+        }
+
         var props = bgLayer.getProperties(player.x, player.y);
         if (props && props.isexit && props.isexit === "true") {
             if (player.goals > 0) {
-
-                var props = this.map.properties;
-                var nextMap = props ? props.nextmap : undefined;
-
-                if (nextMap) {
-                    this.playLevel(nextMap);
-                } else {
-                    console.error("No next map property has been found...!");
-                }
+                playNext.call(this);
             }
+        }
+
+        var nextMapTimeout = this.nextMapTimeout;
+        if (nextMapTimeout && (ticks - this.gameStart > nextMapTimeout)) {
+            playNext.call(this);
         }
     };
 
@@ -352,10 +389,12 @@ function (Assets,
         this.map.draw(camera);
         this.countdown.draw(ctx);
 
-        ctx.save();
-        ctx.translate(Math.floor(screen.width - radar.width), 0);
-        radar.draw(ctx);
-        ctx.restore();
+        if (radar) {
+            ctx.save();
+            ctx.translate(Math.floor(screen.width - radar.width), 0);
+            radar.draw(ctx);
+            ctx.restore();
+        }
 
         screen.flip();
     };
@@ -393,26 +432,11 @@ function (Assets,
      * @param {Map} the map object to be played
      */
     var newGame = function (map) {
-        var bgLayer = map.findLayer(this.LAYER_BACKGROUND);
-        var aiLayer = map.findLayer(this.LAYER_AI);
-        var entLayer = map.findLayer(this.LAYER_ENTITIES);
+        var bgLayer = map.findLayer(LAYER_BACKGROUND);
+        var aiLayer = map.findLayer(LAYER_AI);
+        var entLayer = map.findLayer(LAYER_ENTITIES);
 
-        if (!bgLayer) {
-            console.error("No '" + this.LAYER_BACKGROUND + "' layer on map!");
-            return;
-        }
-
-        if (!aiLayer) {
-            console.error("No '" + this.LAYER_AI + "' layer on map!");
-            return;
-        }
-        
-        if (!entLayer) {
-            console.error("No '" + this.LAYER_ENTITIES + "' layer on map!");
-            return;
-        }
-
-        var countdown = new Countdown(this.ESCAPE_TIME);
+        var countdown = new Countdown(ESCAPE_TIME);
         countdown.addEventListener("tick", function () {
             Audio.play("blip");
         });
@@ -425,7 +449,14 @@ function (Assets,
             }
         });
 
-        var radar = new Radar(bgLayer);
+        var radar = undefined;
+        var showRadar = map.getProperty("showradar");
+
+        if (!showRadar || showRadar === "true") {
+            radar = new Radar(bgLayer);
+        }
+
+        this.nextMapTimeout = parseInt(map.getProperty("nextmaptimeout")) * 1000;
 
         this.bgLayer = bgLayer;
         this.aiLayer = aiLayer;
@@ -435,7 +466,7 @@ function (Assets,
         this.radar = radar;
 
         this.isQuit = false;
-        this.lastUpdate = $_.getTicks();
+        this.gameStart = this.lastUpdate = $_.getTicks();
         
         loadEntities.call(this, entLayer, mainloop);
 
@@ -457,15 +488,21 @@ function (Assets,
         this.quit();
 
         var onMapLoad = function (loadedMap) {
+            if (!sanitizeMap(loadedMap)) {
+                console.error("Level '" + level + "' has errors, can't play it");
+                this.dispatchEvent("loaderror", level);
+                return;
+            }
+
             this.levelName = (typeof level === "string") ?
-                level : this.CUSTOM_LEVEL_NAME;
+                level : CUSTOM_LEVEL_NAME;
 
             newGame.call(this, loadedMap);
             this.dispatchEvent("levelchanged", level);
         }
         
         if (typeof level === "string") {
-            map.loadJSON(this.MAP_BASE_DIR +  level, onMapLoad, this);
+            map.loadJSON(MAP_BASE_DIR +  level, onMapLoad, this);
         } else if (typeof level === "object") {
             map.load(level, onMapLoad, this);
         }

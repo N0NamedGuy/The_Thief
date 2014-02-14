@@ -9,7 +9,7 @@ require(["thief_game", "lib/util"], function (ThiefGame) {
             console.log("Game loaded", level);
         });
 
-        game.playLevel("intro.json");
+        game.playLevel("title.json");
     });
 
     var loadMap = function (file) {
