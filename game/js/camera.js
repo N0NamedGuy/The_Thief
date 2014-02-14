@@ -32,15 +32,15 @@ define(["lib/util", "lib/underscore"], function (Util) {
             y: target ? target.y : this.y
         };
 
-        // Do the lazy and smooth camera
-        // Thanks Aru!
-        this.lastx = (this.lastx * laziness + toFollow.x) / friction;
-        this.lasty = (this.lasty * laziness + toFollow.y) / friction;
-
         if (time) {
             toFollow.x += Math.sin(time) * shake;
             toFollow.y += Math.cos(time) * shake;
         }
+
+        // Do the lazy and smooth camera
+        // Thanks Aru!
+        this.lastx = (this.lastx * laziness + toFollow.x) / friction;
+        this.lasty = (this.lasty * laziness + toFollow.y) / friction;
 
         this.x = (canvas.width / 2) - this.lastx;
         this.y = (canvas.height / 2) - this.lasty;
