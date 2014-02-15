@@ -417,9 +417,7 @@ function (Assets,
         var ctx = this;
 
         if (!this.isQuit) {
-            window.requestAnimationFrame(function () {
-                mainloop.call(ctx);
-            });
+            $_.nextFrame(mainloop, this);
         } else {
             this.dispatchEvent("quit");
         }

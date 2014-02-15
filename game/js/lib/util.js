@@ -258,6 +258,20 @@ define(["lib/underscore"], function util() {
         }
     }
 
+    if (window.requestAnimationFrame) {
+        $_.nextFrame = function (fun, ctx) {
+            window.requestAnimationFrame(function () {
+                fun.call(ctx);
+            });
+        }
+    } else {
+        $_.nextFrame = function (fun, ctx) {
+            window.setTimeout(function () {
+                fun.call(ctx);
+            }, 1000 / 60);
+        }
+    }
+
     /* From: http://stackoverflow.com/a/646643 */
     if (typeof String.prototype.startsWith != 'function') {
         // see below for better implementation!
