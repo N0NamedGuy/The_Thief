@@ -181,22 +181,30 @@ function (Assets,
      */
     var sanitizeMap = function (map) {
         // Check if needed layers exist
-        var bgLayer = map.findLayer(LAYER_BACKGROUND);
-        var aiLayer = map.findLayer(LAYER_AI);
-        var entitiesLayer = map.findLayer(LAYER_ENTITIES);
+        var bgLayerName = map.getProperty("backgroundlayer");
+        var aiLayerName = map.getProperty("ailayer");
+        var entitiesLayerName = map.getProperty("entitieslayer");
+
+        bgLayerName = bgLayerName ? bgLayerName : LAYER_BACKGROUND;
+        aiLayerName = aiLayerName ? aiLayerName : LAYER_AI;
+        entitiesLayerName = entitiesLayerName ? entitiesLayerName : LAYER_ENTITIES;
+
+        var bgLayer = map.findLayer(bgLayerName);
+        var aiLayer = map.findLayer(aiLayerName);
+        var entitiesLayer = map.findLayer(entitiesLayerName);
 
         if (!bgLayer) {
-            console.error("No '" + LAYER_BACKGROUND + "' layer on map!");
+            console.error("No '" + bgLayerName + "' layer on map for the background!");
             return;
         }
 
         if (!aiLayer) {
-            console.error("No '" + LAYER_AI + "' layer on map!");
+            console.error("No '" + aiLayerName + "' layer on map for the AI!");
             return;
         }
         
         if (!entitiesLayer) {
-            console.error("No '" + LAYER_ENTITIES + "' layer on map!");
+            console.error("No '" + entitiesLayerName + "' layer on map for the entities!");
             return;
         }
 
@@ -430,9 +438,17 @@ function (Assets,
      * @param {Map} the map object to be played
      */
     var newGame = function (map) {
-        var bgLayer = map.findLayer(LAYER_BACKGROUND);
-        var aiLayer = map.findLayer(LAYER_AI);
-        var entLayer = map.findLayer(LAYER_ENTITIES);
+        var bgLayerName = map.getProperty("backgroundlayer");
+        var aiLayerName = map.getProperty("ailayer");
+        var entitiesLayerName = map.getProperty("entitieslayer");
+
+        bgLayerName = bgLayerName ? bgLayerName : LAYER_BACKGROUND;
+        aiLayerName = aiLayerName ? aiLayerName : LAYER_AI;
+        entitiesLayerName = entitiesLayerName ? entitiesLayerName : LAYER_ENTITIES;
+
+        var bgLayer = map.findLayer(bgLayerName);
+        var aiLayer = map.findLayer(aiLayerName);
+        var entLayer = map.findLayer(entitiesLayerName);
 
         var countdown = new Countdown(ESCAPE_TIME);
         countdown.addEventListener("tick", function () {
