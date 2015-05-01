@@ -1,4 +1,4 @@
-define(["sprite", "lib/underscore"], function (Sprite) {
+define(["sprite", "underscore/underscore"], function (Sprite) {
     "use strict";
 
     var FollowSprite = function (img, target, offset) {

@@ -12,7 +12,7 @@ define(["assets",
         "screen",
         "lib/util",
         "lib/listener",
-        "lib/underscore"],
+        "underscore/underscore"],
 
 
 function (Assets,

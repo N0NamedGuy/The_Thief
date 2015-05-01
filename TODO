@@ -1,8 +1,8 @@
 TODO List
 
-* Add a radar
 * Different footstep sound for different surfaces
 * Fix enemy chasing (or add a smarter type of enemy)
 * Add line of sight for the guards
 * Hiding in the shadows
 * Add cameras, spotlights and lasers
+* Add dramatic zoom instead of radar

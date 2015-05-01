@@ -1,4 +1,4 @@
-define(["lib/util", "lib/listener", "lib/underscore"], function (Util, listener) {
+define(["lib/util", "lib/listener", "underscore/underscore"], function (Util, listener) {
     "use strict";
 
     var PLAYER_STYLE = "darkgreen";

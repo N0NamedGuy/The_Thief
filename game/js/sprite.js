@@ -1,4 +1,4 @@
-define(["lib/underscore"], function () {
+define(["underscore/underscore"], function () {
     "use strict";
 
     var Sprite = function (img, x, y, h, w) {

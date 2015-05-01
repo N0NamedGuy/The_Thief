@@ -1,4 +1,4 @@
-define(["entity", "follow_sprite", "lib/util", "lib/underscore"],
+define(["entity", "follow_sprite", "lib/util", "underscore/underscore"],
         function (Entity, FollowSprite, Util) {
 
     "use strict";

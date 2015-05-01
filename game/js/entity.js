@@ -1,7 +1,7 @@
 define(["sprite", 
         "lib/util",
         "lib/listener",
-        "lib/underscore"],      
+        "underscore/underscore"],
 
 function (Sprite,
     Util,

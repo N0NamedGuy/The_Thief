@@ -1,4 +1,4 @@
-define(["lib/util", "lib/underscore"], function (Entity, Util) {
+define(["lib/util", "underscore/underscore"], function (Entity, Util) {
     "use strict";
 
     var SCREEN_SCALE_SMALL = 1;

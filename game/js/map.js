@@ -1,4 +1,4 @@
-define(["layer", "lib/util", "lib/listener", "lib/underscore"], function (Layer, Util, listener) {
+define(["layer", "lib/util", "lib/listener", "underscore/underscore"], function (Layer, Util, listener) {
     "use strict";
 
     /**

@@ -1,4 +1,4 @@
-define(["lib/util", "entity", "lib/underscore"], function (Util, Entity) {
+define(["lib/util", "entity", "underscore/underscore"], function (Util, Entity) {
     "use strict";
 
     var Goal = function(entity, map, entities) {

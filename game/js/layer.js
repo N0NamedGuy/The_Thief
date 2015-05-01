@@ -1,4 +1,4 @@
-define(["lib/util", "lib/underscore"], function (Util) {
+define(["lib/util", "underscore/underscore"], function (Util) {
     "use strict";
     var Layer = function (layer, map) {
         var canvas,

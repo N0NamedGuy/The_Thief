@@ -1,0 +1,11 @@
+{
+    "name": "The Thief",
+    "version": "0.1.0",
+    "main": "game/index.html",
+    "private": "true",
+    "ignore": [],
+    "dependencies": {
+        "requirejs": "2.1.x",
+        "underscore" : "1.8.x"
+    }
+}
