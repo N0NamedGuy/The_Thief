@@ -11,7 +11,11 @@
     "devDependencies": {
         "bower": "1.4.x",
         "grunt": "0.4.x",
-        "grunt-cli": "*"
+        "grunt-cli": "*",
+        "local-web-server": "*"
+    },
+    "scripts": {
+        "start": "ws -p 8080 -d game"
     },
     "homepage": "https://github.com/N0NamedGuy/The_Thief",
     "authors": [
