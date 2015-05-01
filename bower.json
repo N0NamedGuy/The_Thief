@@ -2,10 +2,24 @@
     "name": "The Thief",
     "version": "0.1.0",
     "main": "game/index.html",
-    "private": "true",
-    "ignore": [],
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components"
+    ],
     "dependencies": {
         "requirejs": "2.1.x",
-        "underscore" : "1.8.x"
-    }
+        "underscore": "1.8.x"
+    },
+    "homepage": "https://github.com/N0NamedGuy/The_Thief",
+    "authors": [
+        "David <david.nonamedguy@gmail.com>"
+    ],
+    "description": "A 2D based acion and stealth game",
+    "keywords": [
+        "game",
+        "2d",
+        "stealth"
+    ],
+    "license": "MIT"
 }
