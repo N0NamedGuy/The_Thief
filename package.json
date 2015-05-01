@@ -1,0 +1,27 @@
+{
+    "name": "The_Thief",
+    "version": "0.1.0",
+    "main": "game/index.html",
+    "repository": "https://github.com/N0NamedGuy/The_Thief",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components"
+    ],
+    "devDependencies": {
+        "bower": "1.4.x",
+        "grunt": "0.4.x",
+        "grunt-cli": "*"
+    },
+    "homepage": "https://github.com/N0NamedGuy/The_Thief",
+    "authors": [
+        "David <david.nonamedguy@gmail.com>"
+    ],
+    "description": "A 2D based acion and stealth game",
+    "keywords": [
+        "game",
+        "2d",
+        "stealth"
+    ],
+    "license": "MIT"
+}
